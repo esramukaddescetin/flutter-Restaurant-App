@@ -79,6 +79,14 @@ flutter:
       fonts:
         - asset: assets/fonts/Yellowtail-Regular.ttf
 
+    - family: MadimiOne
+      fonts:
+        - asset: assets/fonts/MadimiOne-Regular.ttf
+
+    - family: PermanentMarker
+      fonts:
+        - asset: assets/fonts/PermanentMarker-Regular.ttf
+
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

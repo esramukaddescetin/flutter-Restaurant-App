@@ -33,6 +33,7 @@ class HomePage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20,
                     color: Colors.white70,
+                    fontFamily: 'MadimiOne',
                   ),
                 ),
               ),
@@ -41,7 +42,10 @@ class HomePage extends StatelessWidget {
                 height: 18,
                 child: Divider(color: Colors.brown),
               ),
-              CardEntry(icon: Icons.mail, text: 'pigome@restaurant.com'),
+              CardEntry(
+                icon: Icons.mail,
+                text: 'pigome@restaurant.com',
+              ),
               SizedBox(
                 height: 6,
               ),

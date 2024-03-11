@@ -113,7 +113,9 @@ class RegisterScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/quickrequestsPage');
+                      },
                       child: Text('SIGN UP',
                           style: TextStyle(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
@@ -133,7 +135,6 @@ class RegisterScreen extends StatelessWidget {
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
-                          // kaydınız oluşturuldu diye giriş ekranına yazdır!!!
                         },
                         child: Text('Login'),
                       ),

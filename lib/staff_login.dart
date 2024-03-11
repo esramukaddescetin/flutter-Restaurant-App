@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'my_widgets.dart';
+
 class StaffLoginPage extends StatefulWidget {
   @override
   _StaffLoginPageState createState() => _StaffLoginPageState();
@@ -78,17 +80,7 @@ class _StaffLoginPageState extends State<StaffLoginPage> {
               ),
             ),
           ),
-          Positioned(
-            top: 40,
-            left: 20,
-            child: IconButton(
-              icon: Icon(Icons.arrow_back),
-              iconSize: 32,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
+          IconBack(),
         ],
       ),
     );

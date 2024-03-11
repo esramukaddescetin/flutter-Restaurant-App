@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'my_widgets.dart';
+
 class QuickRequestsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -38,9 +40,26 @@ class QuickRequestsPage extends StatelessWidget {
                       Colors.orange, () {}),
                   SizedBox(height: 10),
                   buildQuickRequestButton(
-                      Icons.restaurant, 'Masama Yeni Servis', Colors.red, () {
-                    // Masaya yeni servis talebiniz alındı mesajı dön
-                  }),
+                    Icons.restaurant,
+                    'Masama Yeni Servis',
+                    Colors.red,
+                    () {
+                      backgroundColor:
+                      MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed)) {
+                            // Butona basıldığında rengi değiştir
+                            return Colors
+                                .brown; // Örneğin, buton basıldığında rengi koyu kahverengi olsun
+                          } else {
+                            // Basılmadığında veya varsayılan durumda rengi
+                            return Colors.red; // Verilen renk olsun
+                          }
+                        },
+                      );
+                      // Masaya yeni servis talebiniz alındı mesajı dön
+                    },
+                  ),
                   SizedBox(height: 10),
                   buildQuickRequestButton(
                       Icons.payment, 'Masada Ödeme', Colors.purple, () {
@@ -56,17 +75,7 @@ class QuickRequestsPage extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            top: 40,
-            left: 20,
-            child: IconButton(
-              icon: Icon(Icons.arrow_back),
-              iconSize: 32,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
+          IconBack(),
         ],
       ),
     );
@@ -108,7 +117,7 @@ class QuickRequestsPage extends StatelessWidget {
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    title: 'Hızlı Talepler',
+    // title: 'Hızlı Talepler',
     home: QuickRequestsPage(),
   ));
 }

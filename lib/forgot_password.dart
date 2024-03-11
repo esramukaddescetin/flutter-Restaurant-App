@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/my_widgets.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   @override
@@ -18,17 +19,7 @@ class ForgotPasswordScreen extends StatelessWidget {
           ),
 
           // Geri gitme butonu
-          Positioned(
-            top: 40,
-            left: 20,
-            child: IconButton(
-              icon: Icon(Icons.arrow_back),
-              iconSize: 32,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
+          IconBack(),
 
           // Şifremi Unuttum Formu
           Center(

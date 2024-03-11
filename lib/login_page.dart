@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'my_widgets.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -118,7 +120,7 @@ class LoginPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Sign In',
+                                'Login',
                                 style: TextStyle(
                                     fontSize: 16, color: Colors.white),
                               ),
@@ -180,17 +182,7 @@ class LoginPage extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            top: 40,
-            left: 20,
-            child: IconButton(
-              icon: Icon(Icons.arrow_back),
-              iconSize: 32,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
+          IconBack(),
         ],
       ),
     );
