@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/payment_page.dart';
 import 'package:restaurant_app/quick_requests.dart';
 import 'package:restaurant_app/signup.dart';
 import 'package:restaurant_app/staff_login.dart';
@@ -19,7 +20,7 @@ class RestaurantApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => WaiterRequestPage(),
+        '/': (context) => HomePage(),
         '/homePage': (context) => HomePage(),
         '/loginPage': (context) => LoginPage(),
         '/signPage': (context) => RegisterScreen(),
@@ -28,6 +29,7 @@ class RestaurantApp extends StatelessWidget {
         '/quickrequestsPage': (context) => QuickRequestsPage(),
         '/menuPage': (context) => MenuPage(),
         '/waiterRequestPage': (context) => WaiterRequestPage(),
+        '/paymentPage': (context) => PaymentPage(),
       },
     );
   }

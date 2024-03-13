@@ -80,7 +80,9 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
                     Icons.credit_card,
                     'Kredi Kartı ile Ödeme',
                     Colors.teal,
-                    () {},
+                    () {
+                      Navigator.pushNamed(context, '/paymentPage');
+                    },
                   ),
                   SizedBox(height: 10),
                   buildQuickRequestButton(
