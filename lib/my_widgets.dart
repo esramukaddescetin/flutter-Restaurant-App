@@ -97,3 +97,22 @@ BoxDecoration WidgetBackcolor(Color color1, Color color2) {
     ),
   );
 }
+
+//InputDecorationların ortak görünümü (payment_page, resevation_page)
+InputDecoration buildInputDecoration(
+  String label,
+  String hint,
+) {
+  return InputDecoration(
+    labelText: label,
+    hintText: hint,
+    hintStyle: TextStyle(
+      color: Colors.white,
+    ),
+    labelStyle: TextStyle(color: Colors.white), // Metin rengi
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: Colors.white), // Çerçeve rengi
+    ),
+  );
+}

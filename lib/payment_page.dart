@@ -17,7 +17,7 @@ class PaymentPage extends StatelessWidget {
         title: Text('Kredi Kartı ile Ödeme',
             style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: Colors.brown[400], // AppBar rengi
+        backgroundColor: Colors.brown[400],
       ),
       body: Container(
         padding: EdgeInsets.all(20),
@@ -33,7 +33,7 @@ class PaymentPage extends StatelessWidget {
               style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white), // Metin rengi
+                  color: Colors.white),
             ),
             SizedBox(height: 20),
             TextFormField(
@@ -43,13 +43,9 @@ class PaymentPage extends StatelessWidget {
                 LengthLimitingTextInputFormatter(16),
                 CreditCardNumberInputFormatter(),
               ],
-              decoration: InputDecoration(
-                labelText: 'Kart Numarası',
-                labelStyle: TextStyle(color: Colors.white), // Metin rengi
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.white), // Çerçeve rengi
-                ),
+              decoration: buildInputDecoration(
+                'Kart Numarası',
+                '',
               ),
             ),
             SizedBox(height: 20),
@@ -65,18 +61,9 @@ class PaymentPage extends StatelessWidget {
                       ExpiryDateInputFormatter(),
                     ],
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'Son Kullanma Tarihi',
-                      hintText: 'MM/YY',
-                      hintStyle: TextStyle(
-                        color: Colors.white,
-                      ),
-                      labelStyle: TextStyle(color: Colors.white), // Metin rengi
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide:
-                            BorderSide(color: Colors.white), // Çerçeve rengi
-                      ),
+                    decoration: buildInputDecoration(
+                      'Son Kullanma Tarihi',
+                      'MM/YY',
                     ),
                   ),
                 ),
@@ -91,14 +78,9 @@ class PaymentPage extends StatelessWidget {
                       FilteringTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(3),
                     ],
-                    decoration: InputDecoration(
-                      labelText: 'CVV',
-                      labelStyle: TextStyle(color: Colors.white), // Metin rengi
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide:
-                            BorderSide(color: Colors.white), // Çerçeve rengi
-                      ),
+                    decoration: buildInputDecoration(
+                      'CVV',
+                      '',
                     ),
                   ),
                 ),
@@ -123,7 +105,7 @@ class PaymentPage extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  backgroundColor: Colors.brown[300], // Buton arka plan rengi
+                  backgroundColor: Colors.brown[300],
                 ),
               ),
             ),
