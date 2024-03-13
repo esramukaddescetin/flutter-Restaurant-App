@@ -9,12 +9,9 @@ class ForgotPasswordScreen extends StatelessWidget {
         children: [
           // Arkaplan
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.white60, Colors.brown.shade900],
-              ),
+            decoration: WidgetBackcolor(
+              Colors.white60,
+              Colors.brown.shade900,
             ),
           ),
 

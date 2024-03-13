@@ -83,3 +83,17 @@ class IconBack extends StatelessWidget {
     );
   }
 }
+
+//Yanar dönerli arka plan rengi
+BoxDecoration WidgetBackcolor(Color color1, Color color2) {
+  return BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        color1,
+        color2,
+      ],
+    ),
+  );
+}

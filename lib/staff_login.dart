@@ -17,13 +17,9 @@ class _StaffLoginPageState extends State<StaffLoginPage> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.brown, Colors.white60],
-                stops: [0.3, 0.7],
-              ),
+            decoration: WidgetBackcolor(
+              Colors.brown,
+              Colors.white60,
             ),
             child: Padding(
               padding: EdgeInsets.all(20.0),

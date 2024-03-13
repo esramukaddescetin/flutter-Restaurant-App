@@ -29,15 +29,9 @@ class LoginPage extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white60,
-                  Colors.brown,
-                ],
-              ),
+            decoration: WidgetBackcolor(
+              Colors.white60,
+              Colors.brown,
             ),
             child: Center(
               child: SingleChildScrollView(

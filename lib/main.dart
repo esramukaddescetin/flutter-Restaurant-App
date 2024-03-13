@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_app/quick_requests.dart';
 import 'package:restaurant_app/signup.dart';
 import 'package:restaurant_app/staff_login.dart';
+import 'package:restaurant_app/waiter_request.dart';
 
 import 'forgot_password.dart';
 import 'home_page.dart';
@@ -18,7 +19,7 @@ class RestaurantApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => HomePage(),
+        '/': (context) => WaiterRequestPage(),
         '/homePage': (context) => HomePage(),
         '/loginPage': (context) => LoginPage(),
         '/signPage': (context) => RegisterScreen(),
@@ -26,6 +27,7 @@ class RestaurantApp extends StatelessWidget {
         '/staffloginPage': (context) => StaffLoginPage(),
         '/quickrequestsPage': (context) => QuickRequestsPage(),
         '/menuPage': (context) => MenuPage(),
+        '/waiterRequestPage': (context) => WaiterRequestPage(),
       },
     );
   }

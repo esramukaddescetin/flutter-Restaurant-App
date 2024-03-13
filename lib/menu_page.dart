@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'my_widgets.dart';
+
 void main() {
   runApp(MenuPage());
 }
@@ -37,15 +39,9 @@ class MenuScreen extends StatelessWidget {
         backgroundColor: Colors.brown,
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.brown,
-              Colors.grey,
-            ],
-          ),
+        decoration: WidgetBackcolor(
+          Colors.brown,
+          Colors.grey,
         ),
         child: SingleChildScrollView(
           child: Column(

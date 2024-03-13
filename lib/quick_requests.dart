@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'my_widgets.dart';
 
-class QuickRequestsPage extends StatelessWidget {
+class QuickRequestsPage extends StatefulWidget {
+  @override
+  State<QuickRequestsPage> createState() => _QuickRequestsPageState();
+}
+
+class _QuickRequestsPageState extends State<QuickRequestsPage> {
+  late Color buttonColor;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,15 +16,9 @@ class QuickRequestsPage extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white,
-                  Colors.brown,
-                ],
-              ),
+            decoration: WidgetBackcolor(
+              Colors.white,
+              Colors.brown,
             ),
             child: Padding(
               padding: const EdgeInsets.all(35.0),
@@ -36,8 +36,14 @@ class QuickRequestsPage extends StatelessWidget {
                     // Garson çağırıldı mesajı dön ekrana
                   }),
                   SizedBox(height: 10),
-                  buildQuickRequestButton(Icons.event_note, 'Garsona Talep Yaz',
-                      Colors.orange, () {}),
+                  buildQuickRequestButton(
+                    Icons.event_note,
+                    'Garsona Talep Yaz',
+                    Colors.orange,
+                    () {
+                      Navigator.pushNamed(context, '/waiterRequestPage');
+                    },
+                  ),
                   SizedBox(height: 10),
                   buildQuickRequestButton(
                     Icons.restaurant,
@@ -62,15 +68,33 @@ class QuickRequestsPage extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   buildQuickRequestButton(
-                      Icons.payment, 'Masada Ödeme', Colors.purple, () {
-                    //Masada Ödeme talebiniz alındı mesajını ekrana yazdır
-                  }),
+                    Icons.payment,
+                    'Masada Ödeme',
+                    Colors.purple,
+                    () {
+                      //Masada Ödeme talebiniz alındı mesajını ekrana yazdır
+                    },
+                  ),
                   SizedBox(height: 10),
-                  buildQuickRequestButton(Icons.credit_card,
-                      'Kredi Kartı ile Ödeme', Colors.teal, () {}),
+                  buildQuickRequestButton(
+                    Icons.credit_card,
+                    'Kredi Kartı ile Ödeme',
+                    Colors.teal,
+                    () {},
+                  ),
                   SizedBox(height: 10),
-                  buildQuickRequestButton(Icons.calendar_today,
-                      'Rezervasyon Yap', Colors.blueGrey, () {}),
+                  buildQuickRequestButton(
+                    Icons.calendar_today,
+                    'Rezervasyon Yap',
+                    Colors.blueGrey,
+                    () {
+                      setState(() {
+                        backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white);
+                        Text('Rezervazyon Yapıldı');
+                      });
+                    },
+                  ),
                 ],
               ),
             ),

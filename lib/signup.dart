@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/my_widgets.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,15 +27,9 @@ class RegisterScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.brown,
-              Colors.grey,
-            ],
-          ),
+        decoration: WidgetBackcolor(
+          Colors.brown,
+          Colors.grey,
         ),
         child: Center(
           child: Padding(
