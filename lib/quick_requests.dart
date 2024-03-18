@@ -8,7 +8,8 @@ class QuickRequestsPage extends StatefulWidget {
 }
 
 class _QuickRequestsPageState extends State<QuickRequestsPage> {
-  late Color buttonColor;
+  bool isButtonPressed = false;
+  Color buttonColor = Colors.green;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,10 +32,18 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
                     Navigator.pushNamed(context, '/menuPage');
                   }),
                   SizedBox(height: 10),
-                  buildQuickRequestButton(
-                      Icons.person, 'Garson Çağır', Colors.green, () {
-                    // Garson çağırıldı mesajı dön ekrana
-                  }),
+                  TextButton(
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(buttonColor),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        buttonColor = Colors.black;
+                      });
+                    },
+                    child: Text('TextButton'),
+                  ),
                   SizedBox(height: 10),
                   buildQuickRequestButton(
                     Icons.event_note,
@@ -72,7 +81,15 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
                     'Masada Ödeme',
                     Colors.purple,
                     () {
-                      //Masada Ödeme talebiniz alındı mesajını ekrana yazdır
+                      setState(() {
+                        print('butona basıldı');
+                        buttonStyle:
+                        ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.white,
+                          textStyle: TextStyle(backgroundColor: Colors.white),
+                        );
+                      });
                     },
                   ),
                   SizedBox(height: 10),
@@ -90,11 +107,7 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
                     'Rezervasyon Yap',
                     Colors.blueGrey,
                     () {
-                      setState(() {
-                        backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white);
-                        Text('Rezervazyon Yapıldı');
-                      });
+                      Navigator.pushNamed(context, '/reservationPage');
                     },
                   ),
                 ],
@@ -110,7 +123,13 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
   Widget buildQuickRequestButton(
       IconData icon, String text, Color color, VoidCallback onPressed) {
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: () {
+        buttonStyle:
+        ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          textStyle: TextStyle(backgroundColor: Colors.white),
+        );
+      },
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(color),
         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(

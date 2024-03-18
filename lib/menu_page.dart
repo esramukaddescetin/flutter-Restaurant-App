@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'my_widgets.dart';
 
 void main() {
-  runApp(MenuPage());
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: MenuScreen(),
+  ));
 }
 
-class MenuPage extends StatelessWidget {
+/*class MenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,19 +21,19 @@ class MenuPage extends StatelessWidget {
       home: MenuScreen(),
     );
   }
-}
+}*/
 
 class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        /*     leading: IconButton(
+        /*leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.of(context).pop();
           },
-        ), */
+        ),*/
         centerTitle: true,
         title: Text(
           'MENÜ',

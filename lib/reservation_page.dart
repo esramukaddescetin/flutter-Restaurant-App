@@ -1,11 +1,43 @@
+//import 'package:calendar_date_picker2/calendar_date_picker2.dart' as dp;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:restaurant_app/my_widgets.dart';
-//import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 //import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
-class ReservationPage extends StatelessWidget {
+class ReservationPage extends StatefulWidget {
+  @override
+  State<ReservationPage> createState() => _ReservationPageState();
+}
+
+class _ReservationPageState extends State<ReservationPage> {
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
   final TextEditingController _phoneController = TextEditingController();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(DateTime.now().year + 1),
+    );
+
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked =
+        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    if (picked != null && picked != _selectedTime)
+      setState(() {
+        _selectedTime = picked;
+      });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,30 +89,40 @@ class ReservationPage extends StatelessWidget {
               SizedBox(height: 10),
               TextFormField(
                 style: TextStyle(color: Colors.white70),
-
                 decoration: buildInputDecoration(
-                  'Tarih',
+                  _selectedDate == null
+                      ? 'Tarih Seçilmedi'
+                      : 'Seçilen Tarih: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
                   '',
                 ),
-                readOnly: true, // Kullanıcıdan giriş yapılmamasını sağlar
-                onTap: () {
-                  // Tarih seçme işlemi yapılabilir
-                },
+                readOnly: true,
+              ),
+              ElevatedButton(
+                onPressed: () => _selectDate(context),
+                child: Text('Tarih Seç', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown[200],
+                ),
               ),
               SizedBox(height: 10),
               TextFormField(
                 style: TextStyle(color: Colors.white70),
-
                 decoration: buildInputDecoration(
-                  'Saat',
+                  _selectedTime == null
+                      ? 'Saat Seç'
+                      : 'Seçilen Saat: ${_selectedTime!.hour}:${_selectedTime!.minute}',
                   '',
                 ),
-                readOnly: true, // Kullanıcıdan giriş yapılmamasını sağlar
-                onTap: () {
-                  // Saat seçme işlemi yapılabilir
-                },
+                readOnly: true,
               ),
-              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => _selectTime(context),
+                child: Text('Saat Seç', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown[200],
+                ),
+              ),
+              SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
                   // Rezervasyon yapma işlemi gerçekleştirilir
