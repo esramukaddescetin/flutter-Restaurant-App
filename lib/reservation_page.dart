@@ -13,7 +13,6 @@ class _ReservationPageState extends State<ReservationPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   final TextEditingController _phoneController = TextEditingController();
-
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -21,7 +20,6 @@ class _ReservationPageState extends State<ReservationPage> {
       firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 1),
     );
-
     if (pickedDate != null && pickedDate != _selectedDate) {
       setState(() {
         _selectedDate = pickedDate;

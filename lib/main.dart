@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/payment_page.dart';
@@ -22,12 +23,24 @@ void main() async {
 }
 
 class RestaurantApp extends StatelessWidget {
+  static final db = FirebaseFirestore.instance;
+
+  static Future<void> LoadAll() async {
+    await db.collection("menuler").get().then((event) {
+      for (var doc in event.docs) {
+        print("${doc.id} => ${doc.data()}");
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    LoadAll();
+
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => QuickRequestsPage(),
+        '/': (context) => HomePage(),
         '/homePage': (context) => HomePage(),
         '/loginPage': (context) => LoginPage(),
         '/signPage': (context) => RegisterScreen(),

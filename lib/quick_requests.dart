@@ -32,7 +32,11 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
                     Navigator.pushNamed(context, '/menuPage');
                   }),
                   SizedBox(height: 10),
-                  TextButton(
+                  buildQuickRequestButton(
+                      Icons.person, 'Garson Çağır', Colors.green, () {
+                    // Garson çağırıldı mesajı dön ekrana
+                  }),
+                  /*  TextButton(
                     style: ButtonStyle(
                       foregroundColor:
                           MaterialStateProperty.all<Color>(buttonColor),
@@ -43,7 +47,7 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
                       });
                     },
                     child: Text('TextButton'),
-                  ),
+                  ),  */
                   SizedBox(height: 10),
                   buildQuickRequestButton(
                     Icons.event_note,
@@ -123,13 +127,14 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
   Widget buildQuickRequestButton(
       IconData icon, String text, Color color, VoidCallback onPressed) {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: onPressed,
+      /* () {
         buttonStyle:
         ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
           textStyle: TextStyle(backgroundColor: Colors.white),
         );
-      },
+      }, */
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(color),
         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
