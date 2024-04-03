@@ -22,10 +22,12 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+
 android {
     namespace "com.example.restaurant_app"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -49,6 +51,8 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        minSdkVersion 21
+
     }
 
     buildTypes {
@@ -60,8 +64,15 @@ android {
     }
 }
 
+
+
+dependencies {
+
+
+}
+
 flutter {
     source '../..'
 }
+apply plugin: 'com.google.gms.google-services'
 
-dependencies {}
