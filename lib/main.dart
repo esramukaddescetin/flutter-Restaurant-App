@@ -9,6 +9,7 @@ import 'package:restaurant_app/screens/signup.dart';
 import 'package:restaurant_app/screens/staff_login.dart';
 import 'package:restaurant_app/screens/waiter_request.dart';
 
+import 'firebase_options.dart';
 import 'screens/forgot_password.dart';
 import 'screens/home_page.dart';
 import 'screens/login_page.dart';
@@ -26,7 +27,9 @@ void main() async {
 } */
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   setupLocator();
   runApp(MultiProvider(
     providers: [

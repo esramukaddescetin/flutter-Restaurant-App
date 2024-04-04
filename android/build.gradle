@@ -17,9 +17,5 @@ tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
 
-dependencies {
-
-    classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
-}
 
 

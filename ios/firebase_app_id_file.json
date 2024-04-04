@@ -1,7 +1,7 @@
 {
   "file_generated_by": "FlutterFire CLI",
   "purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory",
-  "GOOGLE_APP_ID": "1:532133351694:ios:7c62d7c1ed04d3bf84c75f",
-  "FIREBASE_PROJECT_ID": "restaurant-app-31f2f",
-  "GCM_SENDER_ID": "532133351694"
+  "GOOGLE_APP_ID": "1:210214440308:ios:63b7bc240da1ff154ab021",
+  "FIREBASE_PROJECT_ID": "restaurant-app-flutter-27343",
+  "GCM_SENDER_ID": "210214440308"
 }

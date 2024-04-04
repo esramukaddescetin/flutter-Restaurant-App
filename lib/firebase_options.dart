@@ -44,37 +44,38 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBX8Pgy_m8INLj0YpKwh9eK2dtqX0B1ewk',
-    appId: '1:532133351694:web:3439832ac5b1b61784c75f',
-    messagingSenderId: '532133351694',
-    projectId: 'restaurant-app-31f2f',
-    authDomain: 'restaurant-app-31f2f.firebaseapp.com',
-    storageBucket: 'restaurant-app-31f2f.appspot.com',
+    apiKey: 'AIzaSyC_0xRE2nVEjjQLpmPI5KIqVyBKG_vDMpE',
+    appId: '1:210214440308:web:f5b1af0cc75c1cde4ab021',
+    messagingSenderId: '210214440308',
+    projectId: 'restaurant-app-flutter-27343',
+    authDomain: 'restaurant-app-flutter-27343.firebaseapp.com',
+    storageBucket: 'restaurant-app-flutter-27343.appspot.com',
+    measurementId: 'G-0T43HQ7H3V',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDDK0wrR0Ea6KTwpXYncFxRBpdgXPZjPxc',
-    appId: '1:532133351694:android:aa0afec07c34281d84c75f',
-    messagingSenderId: '532133351694',
-    projectId: 'restaurant-app-31f2f',
-    storageBucket: 'restaurant-app-31f2f.appspot.com',
+    apiKey: 'AIzaSyBcTrVR0sqSiutnOYfrWFBJtB0MVOhVnzo',
+    appId: '1:210214440308:android:d92f7140aaf12a324ab021',
+    messagingSenderId: '210214440308',
+    projectId: 'restaurant-app-flutter-27343',
+    storageBucket: 'restaurant-app-flutter-27343.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBb4RRIAb0dOQmHi4qDaYywvzGX2KXE5j0',
-    appId: '1:532133351694:ios:7c62d7c1ed04d3bf84c75f',
-    messagingSenderId: '532133351694',
-    projectId: 'restaurant-app-31f2f',
-    storageBucket: 'restaurant-app-31f2f.appspot.com',
+    apiKey: 'AIzaSyDSoixHOV0IsYK_eFIt4g4C0uu0wI313L8',
+    appId: '1:210214440308:ios:63b7bc240da1ff154ab021',
+    messagingSenderId: '210214440308',
+    projectId: 'restaurant-app-flutter-27343',
+    storageBucket: 'restaurant-app-flutter-27343.appspot.com',
     iosBundleId: 'com.example.restaurantApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBb4RRIAb0dOQmHi4qDaYywvzGX2KXE5j0',
-    appId: '1:532133351694:ios:b8bb3b07c56c492584c75f',
-    messagingSenderId: '532133351694',
-    projectId: 'restaurant-app-31f2f',
-    storageBucket: 'restaurant-app-31f2f.appspot.com',
+    apiKey: 'AIzaSyDSoixHOV0IsYK_eFIt4g4C0uu0wI313L8',
+    appId: '1:210214440308:ios:dc59f11ec64681904ab021',
+    messagingSenderId: '210214440308',
+    projectId: 'restaurant-app-flutter-27343',
+    storageBucket: 'restaurant-app-flutter-27343.appspot.com',
     iosBundleId: 'com.example.restaurantApp.RunnerTests',
   );
 }
