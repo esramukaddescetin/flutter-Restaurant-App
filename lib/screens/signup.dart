@@ -112,13 +112,12 @@ class RegisterScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        locator.get<AuthService>().signUp(
-                            context,
-                            _tName.text,
-                            _tLastName.text,
-                            _tEmail.text,
-                            int.parse(_tPhone.text),
-                            _tPassword.text);
+                        locator.get<AuthService>().signUp(context,
+                            name: _tName.text,
+                            lastname: _tLastName.text,
+                            email: _tEmail.text,
+                            phone: int.parse(_tPhone.text),
+                            password: _tPassword.text);
                         //   Navigator.pushNamed(context, '/quickrequestsPage');
                       },
                       child: Text('SIGN UP',

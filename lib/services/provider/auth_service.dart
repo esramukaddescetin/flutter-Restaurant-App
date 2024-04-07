@@ -9,15 +9,24 @@ class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("users");
   final firebaseAuth = FirebaseAuth.instance;
 
-  Future<void> signUp(BuildContext context, name, String lastname, String email,
-      int phone, String password) async {
+  Future<void> signUp(BuildContext context,
+      {required String name,
+      required String lastname,
+      required String email,
+      required int phone,
+      required String password}) async {
     final navigator = Navigator.of(context);
 
     try {
       final UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
-        _registerUser(name, lastname, email, phone, password);
+        await _registerUser(
+            name: name,
+            lastname: lastname,
+            email: email,
+            phone: phone,
+            password: password);
         navigator.push(
           MaterialPageRoute(
             builder: (context) => QuickRequestsPage(),
@@ -29,7 +38,8 @@ class AuthService {
     }
   }
 
-  Future<void> signIn(BuildContext context, email, String password) async {
+  Future<void> signIn(
+      BuildContext context, String email, String password) async {
     final navigator = Navigator.of(context);
     try {
       final UserCredential userCredential = await firebaseAuth
@@ -48,8 +58,12 @@ class AuthService {
     }
   }
 
-  Future<void> _registerUser(String name, String lastname, String email,
-      int phone, String password) async {
+  Future<void> _registerUser(
+      {required String name,
+      required String lastname,
+      required String email,
+      required int phone,
+      required String password}) async {
     await userCollection.doc().set(
       {
         "name": name,
