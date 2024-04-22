@@ -6,9 +6,9 @@ import 'package:restaurant_app/screens/payment_page.dart';
 import 'package:restaurant_app/screens/quick_requests.dart';
 import 'package:restaurant_app/screens/reservation_page.dart';
 import 'package:restaurant_app/screens/signup.dart';
-import 'package:restaurant_app/screens/staff_login.dart';
 import 'package:restaurant_app/screens/waiter_request.dart';
 
+import 'entry_table_no.dart';
 import 'firebase_options.dart';
 import 'screens/forgot_password.dart';
 import 'screens/home_page.dart';
@@ -65,7 +65,7 @@ class RestaurantApp extends StatelessWidget {
         '/loginPage': (context) => LoginPage(),
         '/signPage': (context) => RegisterScreen(),
         '/forgotpasswordPage': (context) => ForgotPasswordScreen(),
-        '/staffloginPage': (context) => StaffLoginPage(),
+        '/tableNumberPage': (context) => TableNumberPage(),
         '/quickrequestsPage': (context) => QuickRequestsPage(),
         '/menuPage': (context) => MenuScreen(),
         '/waiterRequestPage': (context) => WaiterRequestPage(),

@@ -60,9 +60,9 @@ class HomePage extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/staffloginPage');
+                  Navigator.pushNamed(context, '/tableNumberPage');
                 },
-                child: ButtonEntry(giris: 'Personel Girişi'),
+                child: ButtonEntry(giris: 'Kayıt Olmadan Devam Et'),
               ),
             ],
           ),
