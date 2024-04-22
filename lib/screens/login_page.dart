@@ -103,7 +103,7 @@ class LoginPage extends StatelessWidget {
                               .get<AuthService>()
                               .signIn(context, _tEmail.text, _tPassword.text);
 
-                          Navigator.pushNamed(context, '/quickrequestsPage');
+                          Navigator.pushNamed(context, '/tableNumberPage');
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),

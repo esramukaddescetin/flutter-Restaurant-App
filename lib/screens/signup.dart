@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:restaurant_app/services/provider/auth_service.dart';
 import 'package:restaurant_app/utils/locator.dart';
 import 'package:restaurant_app/utils/my_widgets.dart';
+
+import '../phone_input_formatter.dart';
 
 void main() {
   runApp(MyApp());
@@ -61,9 +64,14 @@ class RegisterScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/images/restaurant_logo.jpg',
-                    width: 150,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(40), // Köşe yarıçapı
+                    child: Image.asset(
+                      'assets/images/restaurant.png',
+                      width: 200,
+                      height: 120,
+                      fit: BoxFit.cover, // Resmin boyutlandırma şekli
+                    ),
                   ),
                   SizedBox(height: 20),
                   inputField(
@@ -96,10 +104,25 @@ class RegisterScreen extends StatelessWidget {
                     'Email',
                   ),
                   SizedBox(height: 10),
-                  inputField(
-                    _tPhone,
-                    Icons.phone,
-                    'Phone Number',
+                  TextFormField(
+                    controller: _tPhone,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
+                      PhoneInputFormatter(),
+                    ],
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        Icons.phone,
+                      ),
+                      hintText: 'Phone Number',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 10),
                   inputField(
@@ -118,7 +141,7 @@ class RegisterScreen extends StatelessWidget {
                             email: _tEmail.text,
                             phone: int.parse(_tPhone.text),
                             password: _tPassword.text);
-                        //   Navigator.pushNamed(context, '/quickrequestsPage');
+                        //   Navigator.pushNamed(context, '/tableNumberPage');
                       },
                       child: Text('SIGN UP',
                           style: TextStyle(color: Colors.white)),
