@@ -8,8 +8,18 @@ class QuickRequestsPage extends StatefulWidget {
 }
 
 class _QuickRequestsPageState extends State<QuickRequestsPage> {
-  bool isButtonPressed = false;
-  Color buttonColor = Colors.green;
+  Color menuButtonColor = Colors.blue;
+  Color callWaiterButtonColor = Colors.green;
+  Color writeRequestButtonColor = Colors.orange;
+  Color newServiceButtonColor = Colors.red;
+  Color paymentButtonColor = Colors.purple;
+  Color creditCardButtonColor = Colors.teal;
+  Color reservationButtonColor = Colors.blueGrey;
+
+  String buttonCallWaiterText = "Garson Çağır";
+  String buttonNewService = "Masama Yeni Servis";
+  String buttonPayment = "Masada Ödeme";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,92 +38,64 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   buildQuickRequestButton(
-                      Icons.restaurant_menu, 'Menü', Colors.blue, () {
+                      Icons.restaurant_menu, 'Menü', menuButtonColor, () {
                     Navigator.pushNamed(context, '/menuPage');
                   }),
                   SizedBox(height: 10),
                   buildQuickRequestButton(
-                      Icons.person, 'Garson Çağır', Colors.green, () {
-                    // Garson çağırıldı mesajı dön ekrana
+                      Icons.person, buttonCallWaiterText, callWaiterButtonColor,
+                          () {
+                        setState(() {
+                          callWaiterButtonColor = Colors.black;
+                          buttonCallWaiterText = 'Garson Çağırıldı';
+                          print('Garson Çağırıldı');
+                        });
+                      }),
+                  SizedBox(height: 10),
+                  buildQuickRequestButton(Icons.event_note, 'Garsona Talep Yaz',
+                      writeRequestButtonColor, () {
+                        setState(() {
+                          writeRequestButtonColor = Colors.orange;
+                          print('Garsona Talep Yaz');
+                        });
+                        Navigator.pushNamed(context, '/waiterRequestPage');
+                      }),
+                  SizedBox(height: 10),
+                  buildQuickRequestButton(
+                      Icons.restaurant, buttonNewService, newServiceButtonColor,
+                          () {
+                        setState(() {
+                          buttonNewService = "Servis Talebi Alındı";
+                          newServiceButtonColor = Colors.black;
+                          print('Masaya Yeni Servis Talebi Alındı');
+                        });
+                      }),
+                  SizedBox(height: 10),
+                  buildQuickRequestButton(
+                      Icons.payment, buttonPayment, paymentButtonColor, () {
+                    setState(() {
+                      paymentButtonColor = Colors.black;
+                      buttonPayment = "Masada Ödeme Talebi Alındı";
+                    });
                   }),
-                  /*  TextButton(
-                    style: ButtonStyle(
-                      foregroundColor:
-                          MaterialStateProperty.all<Color>(buttonColor),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        buttonColor = Colors.black;
-                      });
-                    },
-                    child: Text('TextButton'),
-                  ),  */
                   SizedBox(height: 10),
-                  buildQuickRequestButton(
-                    Icons.event_note,
-                    'Garsona Talep Yaz',
-                    Colors.orange,
-                    () {
-                      Navigator.pushNamed(context, '/waiterRequestPage');
-                    },
-                  ),
+                  buildQuickRequestButton(Icons.credit_card,
+                      'Kredi Kartı ile Ödeme', creditCardButtonColor, () {
+                        setState(() {
+                          creditCardButtonColor = Colors.teal;
+                          print('Kredi Kartı ile Ödeme Yapıldı');
+                        });
+                        Navigator.pushNamed(context, '/paymentPage');
+                      }),
                   SizedBox(height: 10),
-                  buildQuickRequestButton(
-                    Icons.restaurant,
-                    'Masama Yeni Servis',
-                    Colors.red,
-                    () {
-                      backgroundColor:
-                      MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.pressed)) {
-                            // Butona basıldığında rengi değiştir
-                            return Colors
-                                .brown; // Örneğin, buton basıldığında rengi koyu kahverengi olsun
-                          } else {
-                            // Basılmadığında veya varsayılan durumda rengi
-                            return Colors.red; // Verilen renk olsun
-                          }
-                        },
-                      );
-                      // Masaya yeni servis talebiniz alındı mesajı dön
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  buildQuickRequestButton(
-                    Icons.payment,
-                    'Masada Ödeme',
-                    Colors.purple,
-                    () {
-                      setState(() {
-                        print('butona basıldı');
-                        buttonStyle:
-                        ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.white,
-                          textStyle: TextStyle(backgroundColor: Colors.white),
-                        );
-                      });
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  buildQuickRequestButton(
-                    Icons.credit_card,
-                    'Kredi Kartı ile Ödeme',
-                    Colors.teal,
-                    () {
-                      Navigator.pushNamed(context, '/paymentPage');
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  buildQuickRequestButton(
-                    Icons.calendar_today,
-                    'Rezervasyon Yap',
-                    Colors.blueGrey,
-                    () {
-                      Navigator.pushNamed(context, '/reservationPage');
-                    },
-                  ),
+                  buildQuickRequestButton(Icons.calendar_today,
+                      'Rezervasyon Yap', reservationButtonColor, () {
+                        setState(() {
+                          reservationButtonColor = Colors.blueGrey;
+                          print('Rezervasyon Yapıldı');
+                        });
+                        Navigator.pushNamed(context, '/reservationPage');
+                      }),
                 ],
               ),
             ),
@@ -128,18 +110,10 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
       IconData icon, String text, Color color, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
-      /* () {
-        buttonStyle:
-        ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          textStyle: TextStyle(backgroundColor: Colors.white),
-        );
-      }, */
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(color),
-        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-          EdgeInsets.all(20),
-        ),
+        padding:
+        MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.all(20)),
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
@@ -167,7 +141,6 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    // title: 'Hızlı Talepler',
     home: QuickRequestsPage(),
   ));
 }

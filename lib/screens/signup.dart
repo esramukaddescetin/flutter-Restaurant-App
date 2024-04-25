@@ -139,8 +139,10 @@ class RegisterScreen extends StatelessWidget {
                             name: _tName.text,
                             lastname: _tLastName.text,
                             email: _tEmail.text,
-                            phone: int.parse(_tPhone.text),
-                            password: _tPassword.text);
+                            // phone: int.parse(_tPhone.text),
+                            phone: _tPhone.text,
+                            password: _tPassword.text
+                        );
                         //   Navigator.pushNamed(context, '/tableNumberPage');
                       },
                       child: Text('SIGN UP',

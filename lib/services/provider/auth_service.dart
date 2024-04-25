@@ -1,60 +1,81 @@
+import 'dart:math';
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:restaurant_app/entry_table_no.dart';
 
 import '../../screens/quick_requests.dart';
 
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("users");
   final firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> signUp(BuildContext context,
       {required String name,
       required String lastname,
       required String email,
-      required int phone,
+      required String phone,
       required String password}) async {
     final navigator = Navigator.of(context);
 
     try {
       final UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
-      if (userCredential.user != null) {
-        await _registerUser(
-            name: name,
-            lastname: lastname,
-            email: email,
-            phone: phone,
-            password: password);
-        navigator.push(
-          MaterialPageRoute(
-            builder: (context) => QuickRequestsPage(),
-          ),
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
+
+      await userCollection.doc(userCredential.user!.uid).set({
+        'email': email,
+        'name': name,
+        'lastname': lastname,
+        'phone': phone,
+        'password': password,
+        'role': 'user', // Kullanıcıya varsayılan olarak 'user' rolü atanır
+      });
+
+      // Kullanıcı başarılı bir şekilde kaydedildikten sonra, kullanıcı paneline yönlendirme yapılır
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TableNumberPage()),
+      );
+    } catch (e) {
+      // Kayıt işlemi başarısız olursa, hata mesajını gösterin
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to register: $e'),
+      ));
     }
   }
 
   Future<void> signIn(
       BuildContext context, String email, String password) async {
-    final navigator = Navigator.of(context);
     try {
-      final UserCredential userCredential = await firebaseAuth
-          .signInWithEmailAndPassword(email: email, password: password);
-      if (userCredential.user != null) {
-        //giriş başarılı
+      UserCredential userCredential =
+          await firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-        navigator.push(
-          MaterialPageRoute(
-            builder: (context) => QuickRequestsPage(),
-          ),
+      DocumentSnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+      String role = snapshot.get('role');
+
+      if (role == 'user') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TableNumberPage()),
         );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('You are not authorized to access this app.'),
+        ));
       }
-    } on FirebaseAuthException catch (e) {
-      Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to sign in: $e'),
+      ));
     }
   }
 
@@ -62,7 +83,8 @@ class AuthService {
       {required String name,
       required String lastname,
       required String email,
-      required int phone,
+      required String role,
+      required String phone,
       required String password}) async {
     await userCollection.doc().set(
       {

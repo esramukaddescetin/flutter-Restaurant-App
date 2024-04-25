@@ -25,13 +25,12 @@ class MyApp extends StatelessWidget {
 }
 
 class LoginPage extends StatelessWidget {
-  final _tName = TextEditingController();
-  final _tLastName = TextEditingController();
   final _tEmail = TextEditingController();
-  final _tPhone = TextEditingController();
   final _tPassword = TextEditingController();
-  Widget inputField(String text, icon) {
+
+  Widget inputField(String text, icon, TextEditingController controller) {
     return TextFormField(
+      controller: controller,
       decoration: InputDecoration(
         labelText: text,
         prefixIcon: Icon(icon, color: Colors.white),
@@ -92,18 +91,25 @@ class LoginPage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 32),
-                      inputField('Email', Icons.email),
+                      inputField('Email', Icons.email, _tEmail),
                       SizedBox(height: 16),
-                      inputField('Password', Icons.lock),
+                      inputField('Password', Icons.lock, _tPassword),
                       SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () {
-                          onTap:
-                          () => locator
-                              .get<AuthService>()
-                              .signIn(context, _tEmail.text, _tPassword.text);
+                          String email = _tEmail.text.trim();
+                          String password = _tPassword.text.trim();
 
-                          Navigator.pushNamed(context, '/tableNumberPage');
+                          // E-posta ve şifre boş mu kontrol edilir
+                          if (email.isEmpty || password.isEmpty) {
+                            // Eğer boşluk kaldırılmış e-posta ve şifre boşsa, hata mesajı gösterilir
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Please enter email and password.'),
+                            ));
+                          } else {
+                            // E-posta ve şifre boş değilse, giriş yapma işlemi başlatılır
+                            locator.get<AuthService>().signIn(context, email, password);
+                          }
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -113,7 +119,9 @@ class LoginPage extends StatelessWidget {
                               Text(
                                 'Login',
                                 style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
                               ),
                             ],
                           ),
