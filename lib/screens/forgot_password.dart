@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/utils/my_widgets.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
+  final _tEmail = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +57,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 20),
                         TextFormField(
+                          controller: _tEmail,
                           decoration: InputDecoration(
                             labelText: 'E-posta',
                             prefixIcon: Icon(Icons.email),
@@ -63,7 +67,11 @@ class ForgotPasswordScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            FirebaseAuth.instance
+                                .sendPasswordResetEmail(email: _tEmail.text)
+                                .then((value) => Navigator.of(context).pop());
+                          },
                           child: Text(
                             'Şifremi Sıfırla',
                             style: TextStyle(color: Colors.black),
