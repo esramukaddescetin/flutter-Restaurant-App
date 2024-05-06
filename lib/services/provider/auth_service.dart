@@ -1,17 +1,13 @@
-import 'dart:math';
-import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restaurant_app/entry_table_no.dart';
-
-import '../../screens/quick_requests.dart';
 
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("users");
   final firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final firebaseAnonymous = FirebaseAuth.instance;
 
   Future<void> signUp(BuildContext context,
       {required String name,
@@ -95,5 +91,16 @@ class AuthService {
         "password": password,
       },
     );
+  }
+
+  Future signInAnonymous() async {
+    try {
+      final result = await firebaseAnonymous.signInAnonymously();
+      print(result.user!.uid);
+      return result.user;
+    } catch (error) {
+      print(error);
+      return null;
+    }
   }
 }

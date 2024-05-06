@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../services/provider/auth_service.dart';
 import '../utils/my_widgets.dart';
 
 class HomePage extends StatelessWidget {
   static String routeName = '/homePage';
+  final authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +61,15 @@ class HomePage extends StatelessWidget {
                 child: ButtonEntry(giris: 'Müşteri Girişi'),
               ),
               TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/tableNumberPage');
+                onPressed: () async {
+                  final result = await authService.signInAnonymous();
+                  if (result != null) {
+                    Navigator.pushNamed(context, '/tableNumberPage');
+                  } else {
+                    print("hata ile karşılaşıldu");
+                  }
                 },
-                child: ButtonEntry(giris: 'Kayıt Olmadan Devam Et'),
+                child: ButtonEntry(giris: 'Üyeliksiz Devam Et'),
               ),
             ],
           ),
