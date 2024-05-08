@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/services/provider/auth_service.dart';
+import 'package:restaurant_app/services/auth_service.dart';
 
 import '../utils/locator.dart';
 import '../utils/my_widgets.dart';
