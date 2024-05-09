@@ -86,7 +86,8 @@ class _ShoppingCartItemState extends State<ShoppingCartItem> {
       },
     );
   }
-}flutter pub get
+}
+
 void main() {
   runApp(MyApp());
 }
