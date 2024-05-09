@@ -88,19 +88,31 @@ class MenuScreen extends StatelessWidget {
   }
 
   void addToCart(DocumentSnapshot item) async {
-    try {
+  try {
+    // Önce ürünü sepette arayalım
+    final QuerySnapshot cartSnapshot = await FirebaseFirestore.instance.collection('cart').where('name', isEqualTo: item['name']).get();
+    if (cartSnapshot.docs.isNotEmpty) {
+      // Eğer ürün zaten sepette ise, miktarı artır
+      final DocumentSnapshot cartItem = cartSnapshot.docs.first;
+      int quantity = cartItem['quantity'] ?? 0;
+      await cartItem.reference.update({'quantity': quantity + 1});
+    } else {
+      // Eğer ürün sepette değilse, yeni bir belge oluştur ve miktarı 1 olarak ayarla
       await FirebaseFirestore.instance.collection('cart').add({
         'name': item['name'],
         'price': item['price'],
         'imageUrl': item['imageUrl'],
         'ingredients': item['ingredients'],
+        'quantity': 1, // Miktarı 1 olarak ayarla
       });
-      _showSuccessDialog();
-    } catch (e) {
-      print('Error adding to cart: $e');
-      _showErrorDialog();
     }
+    _showSuccessDialog();
+  } catch (e) {
+    print('Error adding to cart: $e');
+    _showErrorDialog();
   }
+}
+
 
   void _showSuccessDialog() {
     // Başarı ile sepete eklendiğine dair bir dialog gösterilebilir.

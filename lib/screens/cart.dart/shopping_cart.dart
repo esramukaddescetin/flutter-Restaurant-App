@@ -33,14 +33,52 @@ class ShoppingCartScreen extends StatelessWidget {
                   height: 100,
                   fit: BoxFit.cover,
                 ),
-                title: Text(item['name']),
-                subtitle: Text('Price: ${item['price']} \$'),
-                // İsterseniz buraya diğer öğe özelliklerini ekleyebilirsiniz
+                title: Row(
+                  children: [
+                    Expanded(
+                      child: Text(item['name']),
+                    ),
+                    SizedBox(width: 20),
+                    Text('Price: ${item['price']} \$'),
+                  ],
+                ),
+                subtitle: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.remove),
+                      onPressed: () {
+                        decreaseQuantity(item);
+                      },
+                    ),
+                    Text(item['quantity'].toString()), // Miktarı göster
+                    IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () {
+                        increaseQuantity(item);
+                      },
+                    ),
+                  ],
+                ),
               );
             },
           );
         },
       ),
     );
+  }
+
+  void increaseQuantity(DocumentSnapshot item) async {
+    int quantity = item['quantity'] ?? 1; // Varsayılan değer 1
+    await item.reference.update({'quantity': quantity + 1});
+  }
+
+  void decreaseQuantity(DocumentSnapshot item) async {
+    int quantity = item['quantity'] ?? 1; // Varsayılan değer 1
+    if (quantity > 1) {
+      await item.reference.update({'quantity': quantity - 1});
+    } else {
+      // Eğer miktar 1'den küçükse, ürünü sil
+      await item.reference.delete();
+    }
   }
 }
