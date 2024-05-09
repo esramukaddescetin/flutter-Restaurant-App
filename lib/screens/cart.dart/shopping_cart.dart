@@ -67,13 +67,19 @@ class ShoppingCartScreen extends StatelessWidget {
     );
   }
 
+<<<<<<< HEAD
 //artirir
+=======
+>>>>>>> be259404ea007f5f36a066e78519d851dafd79c9
   void increaseQuantity(DocumentSnapshot item) async {
     int quantity = item['quantity'] ?? 1; // Varsayılan değer 1
     await item.reference.update({'quantity': quantity + 1});
   }
 
+<<<<<<< HEAD
 //azaltir
+=======
+>>>>>>> be259404ea007f5f36a066e78519d851dafd79c9
   void decreaseQuantity(DocumentSnapshot item) async {
     int quantity = item['quantity'] ?? 1; // Varsayılan değer 1
     if (quantity > 1) {
