@@ -1,231 +1,112 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:restaurant_app/screens/cart.dart/shopping_cart.dart';
 
-import '../utils/my_widgets.dart';
-
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: MenuScreen(),
-  ));
-}
-
-/*class MenuPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'MenuPage',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MenuScreen(),
-    );
-  }
-}*/
 
 class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        /*leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),*/
-        centerTitle: true,
-        title: Text(
-          'MENÜ',
-          style: TextStyle(color: Colors.white, fontFamily: 'PermanentMarker'),
-        ),
-        backgroundColor: Colors.brown,
-      ),
-      body: Container(
-        decoration: WidgetBackcolor(
-          Colors.brown,
-          Colors.grey,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              CategoryCard(
-                category: 'Çorba',
-                items: [
-                  MenuItem(
-                    name: 'Mercimek Çorbası',
-                    ingredients: 'Kırmızı mercimek, soğan, havuç, su, tuz',
-                    price: '10 TL',
-                    imageUrl: 'assets/images/mercimek_corbasi.webp',
-                  ),
-                  MenuItem(
-                    name: 'Domates Çorbası',
-                    ingredients: 'Domates, soğan, un, tuz, biber',
-                    price: '12 TL',
-                    imageUrl: 'assets/images/domates_corbasi.webp',
-                  ),
-                  // Diğer çorba örnekleri...
-                ],
-              ),
-              CategoryCard(
-                category: 'Ana Yemek',
-                items: [
-                  MenuItem(
-                    name: 'Izgara Tavuk',
-                    ingredients: 'Tavuk, baharatlar, salça, yağ',
-                    price: '25 TL',
-                    imageUrl: 'assets/images/izgara_tavuk.webp',
-                  ),
-                  MenuItem(
-                    name: 'Sebzeli Kebap',
-                    ingredients: 'Kuşbaşı et, patlıcan, biber, domates',
-                    price: '30 TL',
-                    imageUrl: 'assets/images/sebzeli_kebap.jpg',
-                  ),
-                  MenuItem(
-                    name: 'Köfte',
-                    ingredients: 'Dana kıyma, soğan, ekmek içi, baharatlar',
-                    price: '18 TL',
-                    imageUrl: 'assets/images/kofte.jpg',
-                  ),
-                  // Diğer ana yemek örnekleri...
-                ],
-              ),
-              CategoryCard(
-                category: 'Ara Sıcak',
-                items: [
-                  MenuItem(
-                    name: 'Sigara Böreği',
-                    ingredients: 'Yufka, peynir, maydanoz, yağ',
-                    price: '8 TL',
-                    imageUrl: 'assets/images/sigara_boregi.jpg',
-                  ),
-                  MenuItem(
-                    name: 'Patates Kızartması',
-                    ingredients: 'Patates, yağ, tuz',
-                    price: '7 TL',
-                    imageUrl: 'assets/images/patates_kizartmasi.webp',
-                  ),
-                  // Diğer ara sıcak örnekleri...
-                ],
-              ),
-              CategoryCard(
-                category: 'Tatlı',
-                items: [
-                  MenuItem(
-                    name: 'Baklava',
-                    ingredients: 'Yufka, ceviz, şeker, tereyağı, şerbet',
-                    price: '20 TL',
-                    imageUrl: 'assets/images/baklava.jpg',
-                  ),
-                  MenuItem(
-                    name: 'Sütlaç',
-                    ingredients: 'Süt, pirinç, şeker, vanilya, tarçın',
-                    price: '15 TL',
-                    imageUrl: 'assets/images/sutlac.webp',
-                  ),
-                  // Diğer tatlı örnekleri...
-                ],
-              ),
-              CategoryCard(
-                category: 'Atıştırmalık',
-                items: [
-                  MenuItem(
-                    name: 'Sandviç',
-                    ingredients: 'Ekmek, salam, peynir, marul, domates',
-                    price: '10 TL',
-                    imageUrl: 'assets/images/sandvic.jpg',
-                  ),
-                  // Diğer atıştırmalık örnekleri...
-                ],
-              ),
-            ],
+        title: Text('Menu'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ShoppingCartScreen()), // ShoppingCartScreen'a yönlendirme yapıldı
+              );
+            },
           ),
-        ),
+        ],
       ),
-    );
-  }
-}
-
-class CategoryCard extends StatelessWidget {
-  final String category;
-  final List<MenuItem> items;
-
-  CategoryCard({required this.category, required this.items});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.all(16.0),
-      child: Container(
-        color: Colors.grey[200],
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                category,
-                style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.brown,
-                    fontFamily: 'MadimiOne'),
-              ),
-            ),
-            Divider(),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: Container(
-                    width: 80.0,
-                    height: 80.0,
-                    child: Image.asset(
-                      items[index].imageUrl,
-                      width: 80.0,
-                      height: 80.0,
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collectionGroup('items').snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text('No menu items available'),
+            );
+          }
+          var items = snapshot.data!.docs;
+          var groupedItems = groupItemsByCategory(items);
+          return ListView.builder(
+            itemCount: groupedItems.length,
+            itemBuilder: (context, index) {
+              var category = groupedItems.keys.toList()[index];
+              var categoryItems = groupedItems[category]!;
+              return ExpansionTile(
+                title: Text(category),
+                children: categoryItems.map((item) {
+                  return ListTile(
+                    leading: Image.network(
+                      item['imageUrl'],
+                      width: 100,
+                      height: 100,
                       fit: BoxFit.cover,
                     ),
-                  ),
-                  title: Text(
-                    items[index].name,
-                    style: TextStyle(
-                      color: Colors.brown,
-                      fontFamily: 'MadimiOne',
+                    title: Text(item['name']),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Price: ${item['price']} \$'),
+                        Text('Ingredients: ${item['ingredients'].join(', ')}'),
+                      ],
                     ),
-                  ),
-                  subtitle: Text(
-                    'Malzemeler: ${items[index].ingredients}\nFiyat: ${items[index].price}',
-                    style: TextStyle(
-                      color: Colors.brown[300],
+                    trailing: IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () {
+                        addToCart(item);
+                      },
                     ),
-                  ),
-                  onTap: () {
-                    // Tıklanan öğeyle ilgili bir işlem yapılabilir
-                  },
-                );
-              },
-            ),
-          ],
-        ),
+                  );
+                }).toList(),
+              );
+            },
+          );
+        },
       ),
     );
   }
-}
 
-class MenuItem {
-  final String name;
-  final String ingredients;
-  final String price;
-  final String imageUrl;
+  Map<String, List<DocumentSnapshot>> groupItemsByCategory(List<DocumentSnapshot> items) {
+    Map<String, List<DocumentSnapshot>> groupedItems = {};
+    items.forEach((item) {
+      var category = item.reference.parent.parent!.id;
+      if (!groupedItems.containsKey(category)) {
+        groupedItems[category] = [];
+      }
+      groupedItems[category]!.add(item);
+    });
+    return groupedItems;
+  }
 
-  MenuItem(
-      {required this.name,
-      required this.ingredients,
-      required this.price,
-      required this.imageUrl});
+  void addToCart(DocumentSnapshot item) async {
+    try {
+      await FirebaseFirestore.instance.collection('cart').add({
+        'name': item['name'],
+        'price': item['price'],
+        'imageUrl': item['imageUrl'],
+        'ingredients': item['ingredients'],
+      });
+      _showSuccessDialog();
+    } catch (e) {
+      print('Error adding to cart: $e');
+      _showErrorDialog();
+    }
+  }
+
+  void _showSuccessDialog() {
+    // Başarı ile sepete eklendiğine dair bir dialog gösterilebilir.
+  }
+
+  void _showErrorDialog() {
+    // Bir hata oluştuğunda kullanıcıya hata mesajı gösterilebilir.
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../services/provider/auth_service.dart';
+import '../services/auth_service.dart';
 import '../utils/my_widgets.dart';
 
 class HomePage extends StatelessWidget {
