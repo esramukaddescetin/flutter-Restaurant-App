@@ -9,7 +9,6 @@ import 'package:restaurant_app/screens/quick_requests.dart';
 import 'package:restaurant_app/screens/reservation_page.dart';
 import 'package:restaurant_app/screens/signup.dart';
 import 'package:restaurant_app/screens/waiter_request.dart';
-import 'package:restaurant_app/services/provider/my_provider.dart';
 
 import 'entry_table_no.dart';
 import 'firebase_options.dart';
@@ -66,7 +65,7 @@ class RestaurantApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => HomePage(),
+        '/': (context) => MenuScreen(),
         '/homePage': (context) => HomePage(),
         '/loginPage': (context) => LoginPage(),
         '/signPage': (context) => RegisterScreen(),

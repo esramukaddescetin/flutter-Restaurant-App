@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:restaurant_app/screens/cart.dart/shopping_cart.dart';
-
 
 class MenuScreen extends StatelessWidget {
   @override
@@ -15,7 +14,7 @@ class MenuScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ShoppingCartScreen()), // ShoppingCartScreen'a yönlendirme yapıldı
+                MaterialPageRoute(builder: (context) => ShoppingCartScreen()),
               );
             },
           ),
@@ -62,7 +61,8 @@ class MenuScreen extends StatelessWidget {
                     trailing: IconButton(
                       icon: Icon(Icons.add),
                       onPressed: () {
-                        addToCart(item);
+                        addToCart(
+                            item); // Burada addToCart fonksiyonunu çağırıyoruz
                       },
                     ),
                   );
@@ -75,7 +75,8 @@ class MenuScreen extends StatelessWidget {
     );
   }
 
-  Map<String, List<DocumentSnapshot>> groupItemsByCategory(List<DocumentSnapshot> items) {
+  Map<String, List<DocumentSnapshot>> groupItemsByCategory(
+      List<DocumentSnapshot> items) {
     Map<String, List<DocumentSnapshot>> groupedItems = {};
     items.forEach((item) {
       var category = item.reference.parent.parent!.id;
@@ -89,12 +90,29 @@ class MenuScreen extends StatelessWidget {
 
   void addToCart(DocumentSnapshot item) async {
     try {
-      await FirebaseFirestore.instance.collection('cart').add({
-        'name': item['name'],
-        'price': item['price'],
-        'imageUrl': item['imageUrl'],
-        'ingredients': item['ingredients'],
-      });
+      // Sepette aynı üründen var mı diye kontrol et
+      QuerySnapshot existingItems = await FirebaseFirestore.instance
+          .collection('cart')
+          .where('name', isEqualTo: item['name'])
+          .get();
+
+      if (existingItems.docs.isNotEmpty) {
+        // Sepette aynı ürün varsa, sayaç artır
+        DocumentSnapshot existingItem = existingItems.docs.first;
+        int currentQuantity = existingItem['quantity'] ?? 0;
+        await existingItem.reference.update({
+          'quantity': currentQuantity + 1,
+        });
+      } else {
+        // Sepette aynı ürün yoksa, yeni bir öğe ekle
+        await FirebaseFirestore.instance.collection('cart').add({
+          'name': item['name'],
+          'price': item['price'],
+          'imageUrl': item['imageUrl'],
+          'ingredients': item['ingredients'],
+          'quantity': 1, // Yeni öğe eklerken sayacı 1 olarak ayarla
+        });
+      }
       _showSuccessDialog();
     } catch (e) {
       print('Error adding to cart: $e');
