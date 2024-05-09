@@ -54,7 +54,7 @@ class CardEntry extends StatelessWidget {
           style: TextStyle(
             color: Colors.white70,
             fontSize: 20,
-            fontFamily: 'MadimiOne',
+            fontFamily: 'Yellowtail',
           ),
         ),
       ),

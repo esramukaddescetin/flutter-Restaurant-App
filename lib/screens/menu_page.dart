@@ -2,75 +2,134 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/screens/cart.dart/shopping_cart.dart';
 
+import '../utils/my_widgets.dart';
+
 class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Menu'),
+        title: Text(
+          'MENU',
+          style: TextStyle(
+            color: Colors.deepPurple[900],
+            fontFamily: 'MadimiOne',
+          ),
+        ),
+        backgroundColor: Colors.deepPurple[300],
         actions: [
           IconButton(
-            icon: Icon(Icons.shopping_cart),
+            icon: Icon(
+              Icons.shopping_cart,
+              color: Colors.white,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ShoppingCartScreen()),
+                MaterialPageRoute(
+                  builder: (context) => ShoppingCartScreen(),
+                ),
               );
             },
           ),
         ],
       ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collectionGroup('items').snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text('No menu items available'),
-            );
-          }
-          var items = snapshot.data!.docs;
-          var groupedItems = groupItemsByCategory(items);
-          return ListView.builder(
-            itemCount: groupedItems.length,
-            itemBuilder: (context, index) {
-              var category = groupedItems.keys.toList()[index];
-              var categoryItems = groupedItems[category]!;
-              return ExpansionTile(
-                title: Text(category),
-                children: categoryItems.map((item) {
-                  return ListTile(
-                    leading: Image.network(
-                      item['imageUrl'],
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
-                    title: Text(item['name']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Price: ${item['price']} \$'),
-                        Text('Ingredients: ${item['ingredients'].join(', ')}'),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed: () {
-                        addToCart(
-                            item); // Burada addToCart fonksiyonunu çağırıyoruz
-                      },
-                    ),
-                  );
-                }).toList(),
+      body: Container(
+        decoration: WidgetBackcolor(
+          Colors.white38,
+          Colors.deepPurple,
+        ),
+        child: StreamBuilder(
+          stream:
+              FirebaseFirestore.instance.collectionGroup('items').snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
               );
-            },
-          );
-        },
+            }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return Center(
+                child: Text(
+                  'No menu items available',
+                  style: TextStyle(fontSize: 18),
+                ),
+              );
+            }
+            var items = snapshot.data!.docs;
+            var groupedItems = groupItemsByCategory(items);
+            return ListView.builder(
+              itemCount: groupedItems.length,
+              itemBuilder: (context, index) {
+                var category = groupedItems.keys.toList()[index];
+                var categoryItems = groupedItems[category]!;
+                return ExpansionTile(
+                  backgroundColor: Colors.grey[300],
+                  title: Text(
+                    category,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple[800],
+                      fontFamily: 'MadimiOne',
+                    ),
+                  ),
+                  children: categoryItems.map((item) {
+                    return Container(
+                      color: Colors.grey.withOpacity(0.1),
+                      child: ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            item['imageUrl'],
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        title: Text(
+                          item['name'],
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Ingredients: ${item['ingredients'].join(', ')}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.blueGrey,
+                              ),
+                            ),
+                            Text(
+                              'Price: ${item['price']} \₺',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.teal,
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(
+                            Icons.add,
+                            color: Colors.blue[900],
+                          ),
+                          onPressed: () {
+                            addToCart(item);
+                          },
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -90,27 +149,24 @@ class MenuScreen extends StatelessWidget {
 
   void addToCart(DocumentSnapshot item) async {
     try {
-      // Sepette aynı üründen var mı diye kontrol et
-      QuerySnapshot existingItems = await FirebaseFirestore.instance
+      // ürünü sepette ara
+      final QuerySnapshot cartSnapshot = await FirebaseFirestore.instance
           .collection('cart')
           .where('name', isEqualTo: item['name'])
           .get();
-
-      if (existingItems.docs.isNotEmpty) {
-        // Sepette aynı ürün varsa, sayaç artır
-        DocumentSnapshot existingItem = existingItems.docs.first;
-        int currentQuantity = existingItem['quantity'] ?? 0;
-        await existingItem.reference.update({
-          'quantity': currentQuantity + 1,
-        });
+      if (cartSnapshot.docs.isNotEmpty) {
+        // Eğer ürün zaten sepette ise, miktarı artır
+        final DocumentSnapshot cartItem = cartSnapshot.docs.first;
+        int quantity = cartItem['quantity'] ?? 0;
+        await cartItem.reference.update({'quantity': quantity + 1});
       } else {
-        // Sepette aynı ürün yoksa, yeni bir öğe ekle
+        // Eğer ürün sepette değilse, yeni bir belge oluştur ve miktarı 1 olarak ayarla
         await FirebaseFirestore.instance.collection('cart').add({
           'name': item['name'],
           'price': item['price'],
           'imageUrl': item['imageUrl'],
           'ingredients': item['ingredients'],
-          'quantity': 1, // Yeni öğe eklerken sayacı 1 olarak ayarla
+          'quantity': 1,
         });
       }
       _showSuccessDialog();
