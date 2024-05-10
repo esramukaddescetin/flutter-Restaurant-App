@@ -2,11 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ShoppingCartScreen extends StatelessWidget {
+ final int tableNumber;
+
+  ShoppingCartScreen({required this.tableNumber});
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('Shopping Cart'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.send),
+            onPressed: () {
+              sendOrdersToFirestore(tableNumber);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Orders sent to the waiter!'),
+              ));
+            },
+          ),
+        ],
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('cart').snapshots(),
@@ -81,4 +96,23 @@ class ShoppingCartScreen extends StatelessWidget {
       await item.reference.delete();
     }
   }
+
+  void sendOrdersToFirestore(int tableNumber) async {
+  final cartItems = await FirebaseFirestore.instance.collection('cart').get();
+  for (var item in cartItems.docs) {
+    await FirebaseFirestore.instance.collection('orders').add({
+      'name': item['name'],
+      'price': item['price'],
+      'quantity': item['quantity'],
+      'imageUrl': item['imageUrl'],
+      'tableNumber': item['tableNumber'], // Siparişin orijinal masası
+      'originalTableNumber': tableNumber, // Siparişin hangi masaya ait olduğunu belirt
+    });
+  }
+  await FirebaseFirestore.instance.collection('cart').get().then((snapshot) {
+    for (DocumentSnapshot ds in snapshot.docs) {
+      ds.reference.delete();
+    }
+  });
+}
 }

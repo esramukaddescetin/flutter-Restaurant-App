@@ -6,16 +6,17 @@ import 'package:restaurant_app/screens/cart.dart/shopping_cart.dart';
 class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final int tableNumber = ModalRoute.of(context)?.settings.arguments as int;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Menu'),
+        title: Text('Menu, $tableNumber'),
         actions: [
           IconButton(
             icon: Icon(Icons.shopping_cart),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ShoppingCartScreen()), // ShoppingCartScreen'a yönlendirme yapıldı
+                MaterialPageRoute(builder: (context) => ShoppingCartScreen(tableNumber: tableNumber)), // ShoppingCartScreen'a yönlendirme yapıldı
               );
             },
           ),
@@ -62,7 +63,7 @@ class MenuScreen extends StatelessWidget {
                     trailing: IconButton(
                       icon: Icon(Icons.add),
                       onPressed: () {
-                        addToCart(item);
+                        addToCart(item, tableNumber);
                       },
                     ),
                   );
@@ -87,23 +88,21 @@ class MenuScreen extends StatelessWidget {
     return groupedItems;
   }
 
-  void addToCart(DocumentSnapshot item) async {
+  void addToCart(DocumentSnapshot item, int tableNumber) async {
   try {
-    // Önce ürünü sepette arayalım
     final QuerySnapshot cartSnapshot = await FirebaseFirestore.instance.collection('cart').where('name', isEqualTo: item['name']).get();
     if (cartSnapshot.docs.isNotEmpty) {
-      // Eğer ürün zaten sepette ise, miktarı artır
       final DocumentSnapshot cartItem = cartSnapshot.docs.first;
       int quantity = cartItem['quantity'] ?? 0;
       await cartItem.reference.update({'quantity': quantity + 1});
     } else {
-      // Eğer ürün sepette değilse, yeni bir belge oluştur ve miktarı 1 olarak ayarla
       await FirebaseFirestore.instance.collection('cart').add({
         'name': item['name'],
         'price': item['price'],
         'imageUrl': item['imageUrl'],
         'ingredients': item['ingredients'],
-        'quantity': 1, // Miktarı 1 olarak ayarla
+        'quantity': 1,
+        'tableNumber': tableNumber, // Table number'ı ekleyin
       });
     }
     _showSuccessDialog();

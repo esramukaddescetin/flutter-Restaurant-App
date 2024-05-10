@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/screens/cart.dart/shopping_cart.dart';
+import 'package:restaurant_app/screens/quick_requests.dart';
 import 'package:restaurant_app/utils/my_widgets.dart';
 
 class TableNumberPage extends StatefulWidget {
@@ -15,11 +17,11 @@ class _TableNumberPageState extends State<TableNumberPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.brown,
-        title: Text(
+        title: const Text(
           'Masa Numarası',
           style: TextStyle(color: Colors.white),
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
         decoration: WidgetBackcolor(
@@ -30,77 +32,66 @@ class _TableNumberPageState extends State<TableNumberPage> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment:
-                CrossAxisAlignment.start, // Sola yaslanması için
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Masa numaranızı giriniz',
                 style: TextStyle(
                   fontSize: 25.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
-
-                textAlign: TextAlign.left, // Sola yaslanması için
+                textAlign: TextAlign.left,
               ),
-              SizedBox(height: 20.0),
+              const SizedBox(height: 20.0),
               TextField(
                 controller: _tableNumberController,
                 keyboardType: TextInputType.number,
                 maxLength: 2,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
-                ), // Metin rengini beyaz yap
+                ),
                 decoration: InputDecoration(
                   labelText: 'Masa Numarası (0-20)',
-                  labelStyle:
-                      TextStyle(color: Colors.white), // Metin rengini beyaz yap
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.white), // Çizgi rengini beyaz yap
+                  labelStyle: const TextStyle(color: Colors.white),
+                  border: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors
-                            .white), // Aktif olmayan çizgi rengini beyaz yap
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors
-                            .white), // Odaklanılan çizgi rengini beyaz yap
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
                   ),
-                  counterStyle: TextStyle(
-                      color: Colors
-                          .brown[300]), // Sayma metninin rengini beyaz yap
+                  counterStyle: TextStyle(color: Colors.brown[300]),
                   errorText: _errorMessage.isNotEmpty ? _errorMessage : null,
-                  errorStyle: TextStyle(
-                      color:
-                          Colors.red[900]), // Hata metninin rengini beyaz yap
+                  errorStyle: const TextStyle(color: Colors.red),
                 ),
               ),
-              SizedBox(height: 20.0),
+              const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-                  // Masa numarası bilgisini al
                   int tableNumber =
                       int.tryParse(_tableNumberController.text) ?? 0;
-
-                  // Girilen numara 20'den büyükse hata mesajı göster
                   if (tableNumber > 20) {
                     setState(() {
                       _errorMessage = 'Masa numarası 20\'den büyük olamaz';
                     });
                   } else {
-                    // Alınan masa numarasını kullanarak ilgili işlemi gerçekleştir
-                    // Örneğin, bir sonraki ekrana geçiş yapabilir veya veritabanına kaydedebilirsiniz
                     setState(() {
                       _errorMessage = '';
-                      //masa müsaitse yönlendir!!
-                      Navigator.pushNamed(context, '/quickrequestsPage');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuickRequestsPage(
+                            tableNumber: tableNumber,
+                          ),
+                        ),
+                      );
                     });
                   }
                 },
-                child: Text(
+                child: const Text(
                   'Giriş Yap',
                   style: TextStyle(
                     color: Colors.white,
@@ -108,10 +99,11 @@ class _TableNumberPageState extends State<TableNumberPage> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                      vertical: 15.0,
-                      horizontal: 45.0), // Buton boyutunu ayarla
-                  backgroundColor: Colors.brown, // Buton rengini belirle
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15.0,
+                    horizontal: 45.0,
+                  ),
+                  backgroundColor: Colors.brown,
                 ),
               ),
             ],
@@ -123,7 +115,6 @@ class _TableNumberPageState extends State<TableNumberPage> {
 
   @override
   void dispose() {
-    // Belleği temizle
     _tableNumberController.dispose();
     super.dispose();
   }
