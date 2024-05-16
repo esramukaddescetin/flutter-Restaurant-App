@@ -184,11 +184,7 @@ packages:
       sha256: "82f5e203cb0a83ccfce7d9b02de63c94e2f56fae96788df4b7446ca2cc81dac7"
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
     version: "3.6.33"
-=======
-    version: "3.6.28"
->>>>>>> be259404ea007f5f36a066e78519d851dafd79c9
   firebase_database:
     dependency: "direct main"
     description:
@@ -212,11 +208,7 @@ packages:
       sha256: d5795e387f507e20146f689ddddb4674451492fbd513744c9513faaab761cad7
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
     version: "0.2.5+5"
-=======
-    version: "0.2.5+4"
->>>>>>> be259404ea007f5f36a066e78519d851dafd79c9
   firebase_messaging:
     dependency: "direct main"
     description:

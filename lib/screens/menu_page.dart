@@ -7,13 +7,14 @@ import '../utils/my_widgets.dart';
 class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final int tableNumber = ModalRoute.of(context)?.settings.arguments as int;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'MENU',
+          'MENU, $tableNumber',
           style: TextStyle(
             color: Colors.deepPurple[900],
-            fontFamily: 'MadimiOne',
+            fontFamily: 'PermanentMarker',
           ),
         ),
         backgroundColor: Colors.deepPurple[300],
@@ -27,8 +28,9 @@ class MenuScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ShoppingCartScreen(),
-                ),
+                    builder: (context) => ShoppingCartScreen(
+                        tableNumber:
+                            tableNumber)), // ShoppingCartScreen'a yönlendirme yapıldı
               );
             },
           ),
@@ -44,12 +46,12 @@ class MenuScreen extends StatelessWidget {
               FirebaseFirestore.instance.collectionGroup('items').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text(
                   'No menu items available',
                   style: TextStyle(fontSize: 18),
@@ -82,8 +84,8 @@ class MenuScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           child: Image.network(
                             item['imageUrl'],
-                            width: 80,
-                            height: 80,
+                            width: 100,
+                            height: 100,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -119,7 +121,7 @@ class MenuScreen extends StatelessWidget {
                             color: Colors.blue[900],
                           ),
                           onPressed: () {
-                            addToCart(item);
+                            addToCart(item, tableNumber);
                           },
                         ),
                       ),
@@ -147,26 +149,24 @@ class MenuScreen extends StatelessWidget {
     return groupedItems;
   }
 
-  void addToCart(DocumentSnapshot item) async {
+  void addToCart(DocumentSnapshot item, int tableNumber) async {
     try {
-      // ürünü sepette ara
       final QuerySnapshot cartSnapshot = await FirebaseFirestore.instance
           .collection('cart')
           .where('name', isEqualTo: item['name'])
           .get();
       if (cartSnapshot.docs.isNotEmpty) {
-        // Eğer ürün zaten sepette ise, miktarı artır
         final DocumentSnapshot cartItem = cartSnapshot.docs.first;
         int quantity = cartItem['quantity'] ?? 0;
         await cartItem.reference.update({'quantity': quantity + 1});
       } else {
-        // Eğer ürün sepette değilse, yeni bir belge oluştur ve miktarı 1 olarak ayarla
         await FirebaseFirestore.instance.collection('cart').add({
           'name': item['name'],
           'price': item['price'],
           'imageUrl': item['imageUrl'],
           'ingredients': item['ingredients'],
           'quantity': 1,
+          'tableNumber': tableNumber, // Table number'ı ekleyin
         });
       }
       _showSuccessDialog();

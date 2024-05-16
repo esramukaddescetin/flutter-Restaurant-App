@@ -65,15 +65,15 @@ class RestaurantApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => MenuScreen(),
+        '/': (context) => HomePage(),
         '/homePage': (context) => HomePage(),
         '/loginPage': (context) => LoginPage(),
         '/signPage': (context) => RegisterScreen(),
         '/forgotpasswordPage': (context) => ForgotPasswordScreen(),
         '/tableNumberPage': (context) => TableNumberPage(),
-        '/quickrequestsPage': (context) => QuickRequestsPage(),
+        '/quickrequestsPage': (context) => QuickRequestsPage(tableNumber: 1),
         '/menuPage': (context) => MenuScreen(),
-        '/cartPage': (context) => ShoppingCartScreen(),
+        '/cartPage': (context) => ShoppingCartScreen(tableNumber: 1),
         '/waiterRequestPage': (context) => WaiterRequestPage(),
         '/paymentPage': (context) => PaymentPage(),
         '/reservationPage': (context) => ReservationPage(),
