@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/screens/cart.dart/order_list.dart';
 
 import '../../utils/my_widgets.dart';
 
@@ -7,6 +8,7 @@ class ShoppingCartScreen extends StatelessWidget {
   final int tableNumber;
 
   ShoppingCartScreen({required this.tableNumber});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +29,7 @@ class ShoppingCartScreen extends StatelessWidget {
             ),
             onPressed: () {
               sendOrdersToFirestore(tableNumber);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text('Orders sent to the waiter!'),
               ));
             },
@@ -43,12 +45,12 @@ class ShoppingCartScreen extends StatelessWidget {
           stream: FirebaseFirestore.instance.collection('cart').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text('Shopping cart is empty'),
               );
             }
@@ -69,13 +71,13 @@ class ShoppingCartScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           item['name'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black54,
                           ),
                         ),
                       ),
-                      SizedBox(width: 20),
+                      const SizedBox(width: 20),
                       Text(
                         'Price: ${item['price']} \₺',
                         style: TextStyle(
@@ -88,19 +90,25 @@ class ShoppingCartScreen extends StatelessWidget {
                   subtitle: Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.remove),
+                        icon: const Icon(Icons.remove),
                         onPressed: () {
                           decreaseQuantity(item);
                         },
                       ),
                       Text(item['quantity'].toString()), // Miktarı göster
                       IconButton(
-                        icon: Icon(Icons.add),
+                        icon: const Icon(Icons.add),
                         onPressed: () {
                           increaseQuantity(item);
                         },
                       ),
                     ],
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      deleteItem(item);
+                    },
                   ),
                 );
               },
@@ -126,6 +134,10 @@ class ShoppingCartScreen extends StatelessWidget {
     }
   }
 
+  void deleteItem(DocumentSnapshot item) async {
+    await item.reference.delete();
+  }
+
   void sendOrdersToFirestore(int tableNumber) async {
     final cartItems = await FirebaseFirestore.instance.collection('cart').get();
     for (var item in cartItems.docs) {
@@ -134,9 +146,8 @@ class ShoppingCartScreen extends StatelessWidget {
         'price': item['price'],
         'quantity': item['quantity'],
         'imageUrl': item['imageUrl'],
-        'tableNumber': item['tableNumber'], // Siparişin orijinal masası
-        'originalTableNumber':
-            tableNumber, // Siparişin hangi masaya ait olduğunu belirt
+        'tableNumber': item['tableNumber'],
+        'originalTableNumber': tableNumber,
       });
     }
     await FirebaseFirestore.instance.collection('cart').get().then((snapshot) {
