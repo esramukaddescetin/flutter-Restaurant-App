@@ -50,12 +50,12 @@ class OrderListScreen extends StatelessWidget {
               .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text('No orders found'),
               );
             }
@@ -75,7 +75,7 @@ class OrderListScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Total Price: ${totalPrice.toStringAsFixed(2)} \₺',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -98,7 +98,7 @@ class OrderListScreen extends StatelessWidget {
                         ),
                         title: Text(
                           item['name'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black54,
                           ),

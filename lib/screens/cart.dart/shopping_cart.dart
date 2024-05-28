@@ -129,7 +129,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 },
               ),
             ),
-            if (orderSent)
+            if (!orderSent) // Sipariş gönderilmediyse butonu göster
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
