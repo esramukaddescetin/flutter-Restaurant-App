@@ -1,8 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-import '../utils/my_widgets.dart';
 
 class QuickRequestsPage extends StatefulWidget {
   final int tableNumber;
@@ -15,9 +13,6 @@ class QuickRequestsPage extends StatefulWidget {
 }
 
 class _QuickRequestsPageState extends State<QuickRequestsPage> {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
   Color menuButtonColor = Colors.blue;
   Color callWaiterButtonColor = Colors.green;
   Color writeRequestButtonColor = Colors.orange;
@@ -30,15 +25,74 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
   String buttonNewService = "Masama Yeni Servis";
   String buttonPayment = "Masada Ödeme";
 
+  bool isCallWaiterEnabled = true;
+  bool isNewServiceEnabled = true;
+  bool isPaymentEnabled = true;
+
   @override
   void initState() {
     super.initState();
-    // Bildirim ayarlarını yapılandır ve başlat
+
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .where('tableNumber', isEqualTo: widget.tableNumber)
+        .where('message', isEqualTo: 'Garson Çağırıldı')
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        var data = snapshot.docs.first.data();
+        bool isChecked = data['checked'] ?? false;
+        setState(() {
+          isCallWaiterEnabled = isChecked;
+          buttonCallWaiterText =
+              isChecked ? 'Garson Çağır' : 'Garson Çağırıldı';
+          callWaiterButtonColor = isChecked ? Colors.green : Colors.black;
+        });
+      }
+    });
+
+    // Yeni servis talebi bildirimlerini dinleyin
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .where('tableNumber', isEqualTo: widget.tableNumber)
+        .where('message', isEqualTo: 'Yeni servis talebi alındı')
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        var data = snapshot.docs.first.data();
+        bool isChecked = data['checked'] ?? false;
+        setState(() {
+          isNewServiceEnabled = isChecked;
+          buttonNewService =
+              isChecked ? 'Masama Yeni Servis' : 'Servis Talebi Alındı';
+          newServiceButtonColor = isChecked ? Colors.red : Colors.black;
+        });
+      }
+    });
+
+    // Ödeme talebi bildirimlerini dinleyin
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .where('tableNumber', isEqualTo: widget.tableNumber)
+        .where('message', isEqualTo: 'Ödeme talebi alındı')
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        var data = snapshot.docs.first.data();
+        bool isChecked = data['checked'] ?? false;
+        setState(() {
+          isPaymentEnabled = isChecked;
+          buttonPayment =
+              isChecked ? 'Masada Ödeme' : 'Masada Ödeme Talebi Alındı';
+          paymentButtonColor = isChecked ? Colors.purple : Colors.black;
+        });
+      }
+    });
+
     final InitializationSettings initializationSettings =
-        InitializationSettings(
+        const InitializationSettings(
             android: AndroidInitializationSettings('app_icon'),
             iOS: DarwinInitializationSettings());
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   @override
@@ -48,9 +102,13 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
       body: Stack(
         children: [
           Container(
-            decoration: WidgetBackcolor(
-              Colors.white,
-              Colors.brown,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              gradient: LinearGradient(
+                colors: [Colors.brown[100]!, Colors.brown[300]!],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.all(35.0),
@@ -60,101 +118,85 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
                 children: [
                   buildQuickRequestButton(
                       Icons.restaurant_menu, 'Menü', menuButtonColor, () {
-                    // Menü butonuna basıldığında
                     Navigator.pushNamed(context, '/menuPage',
                         arguments: widget.tableNumber);
                   }),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   buildQuickRequestButton(
-                      Icons.person, buttonCallWaiterText, callWaiterButtonColor,
-                      () {
-                    // Garson çağır butonuna basıldığında
-                    setState(() {
-                      callWaiterButtonColor = Colors.black;
-                      buttonCallWaiterText = 'Garson Çağırıldı';
-                      print('Garson Çağırıldı');
-                    });
-                    sendNotification('Garson Çağırıldı',
-                        'Masa ${widget.tableNumber} için garson çağrıldı');
-                    sendNotificationToFirebase(
-                        widget.tableNumber, 'Garson çağırıldı');
-                  }),
-                  SizedBox(height: 10),
+                      Icons.person,
+                      buttonCallWaiterText,
+                      callWaiterButtonColor,
+                      isCallWaiterEnabled
+                          ? () {
+                              setState(() {
+                                callWaiterButtonColor = Colors.black;
+                                sendNotificationToFirebase(
+                                    widget.tableNumber, 'Garson Çağırıldı');
+                              });
+                            }
+                          : null),
+                  const SizedBox(height: 10),
                   buildQuickRequestButton(Icons.event_note, 'Garsona Talep Yaz',
                       writeRequestButtonColor, () {
-                    // Garsona talep yaz butonuna basıldığında
-                    setState(() {
-                      writeRequestButtonColor = Colors.orange;
-                      print('Garsona Talep Yaz');
-                    });
                     Navigator.pushNamed(context, '/waiterRequestPage');
                   }),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   buildQuickRequestButton(
-                      Icons.restaurant, buttonNewService, newServiceButtonColor,
-                      () {
-                    // Yeni servis talebi butonuna basıldığında
-                    setState(() {
-                      buttonNewService = "Servis Talebi Alındı";
-                      newServiceButtonColor = Colors.black;
-                      print('Masaya Yeni Servis Talebi Alındı');
-                    });
-                    sendNotification('Yeni Servis Talebi Alındı',
-                        'Masa ${widget.tableNumber} için yeni servis talebi alındı');
-                    sendNotificationToFirebase(
-                        widget.tableNumber, 'Yeni servis talebi alındı');
-                  }),
-                  SizedBox(height: 10),
+                      Icons.restaurant,
+                      buttonNewService,
+                      newServiceButtonColor,
+                      isNewServiceEnabled
+                          ? () {
+                              setState(() {
+                                newServiceButtonColor = Colors.black;
+                              });
+                              sendNotificationToFirebase(widget.tableNumber,
+                                  'Yeni servis talebi alındı');
+                            }
+                          : null),
+                  const SizedBox(height: 10),
                   buildQuickRequestButton(
-                      Icons.payment, buttonPayment, paymentButtonColor, () {
-                    // Ödeme talebi butonuna basıldığında
-                    setState(() {
-                      paymentButtonColor = Colors.black;
-                      buttonPayment = "Masada Ödeme Talebi Alındı";
-                    });
-                    sendNotification('Ödeme Talebi Alındı',
-                        'Masa ${widget.tableNumber} için ödeme talebi alındı');
-                    sendNotificationToFirebase(
-                        widget.tableNumber, 'Ödeme talebi alındı');
-                  }),
-                  SizedBox(height: 10),
+                      Icons.payment,
+                      buttonPayment,
+                      paymentButtonColor,
+                      isPaymentEnabled
+                          ? () {
+                              setState(() {
+                                paymentButtonColor = Colors.black;
+                              });
+                              sendNotificationToFirebase(
+                                  widget.tableNumber, 'Ödeme talebi alındı');
+                            }
+                          : null),
+                  const SizedBox(height: 10),
                   buildQuickRequestButton(Icons.credit_card,
                       'Kredi Kartı ile Ödeme', creditCardButtonColor, () {
                     // Kredi kartı ile ödeme butonuna basıldığında
-                    setState(() {
-                      creditCardButtonColor = Colors.teal;
-                      print('Kredi Kartı ile Ödeme Yapıldı');
-                    });
                     Navigator.pushNamed(context, '/paymentPage');
                   }),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   buildQuickRequestButton(Icons.calendar_today,
                       'Rezervasyon Yap', reservationButtonColor, () {
                     // Rezervasyon yap butonuna basıldığında
-                    setState(() {
-                      reservationButtonColor = Colors.blueGrey;
-                      print('Rezervasyon Yapıldı');
-                    });
                     Navigator.pushNamed(context, '/reservationPage');
                   }),
                 ],
               ),
             ),
           ),
-          IconBack(),
         ],
       ),
     );
   }
 
   Widget buildQuickRequestButton(
-      IconData icon, String text, Color color, VoidCallback onPressed) {
+      IconData icon, String text, Color color, VoidCallback? onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(color),
-        padding:
-            MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.all(20)),
+        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+            const EdgeInsets.all(20)),
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
@@ -168,38 +210,17 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
             icon,
             color: Colors.white,
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Text(
             text,
-            style: TextStyle(fontSize: 18, color: Colors.white),
+            style: const TextStyle(fontSize: 18, color: Colors.white),
           ),
         ],
       ),
     );
   }
 
-  // Bildirim gönderme fonksiyonu
-  Future<void> sendNotification(String title, String body) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'channel_id',
-      'channel_name',
-      channelDescription: 'channel_description',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      0, // Bildirim ID'si
-      title, // Bildirim başlığı
-      body, // Bildirim içeriği
-      platformChannelSpecifics,
-      payload: 'item x', // İsteğe bağlı payload
-    );
-  }
-
-  // Firebase'e bildirim gönderme fonksiyonu
+// Firebase'e bildirim gönderme fonksiyonu
   void sendNotificationToFirebase(
       int tableNumber, String notificationMessage) async {
     try {
@@ -207,6 +228,7 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
         'tableNumber': tableNumber,
         'message': notificationMessage,
         'timestamp': FieldValue.serverTimestamp(),
+        'checked': false,
       });
       print('Bildirim Firebase\'e başarıyla gönderildi.');
     } catch (e) {

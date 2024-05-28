@@ -148,6 +148,7 @@ class ShoppingCartScreen extends StatelessWidget {
         'imageUrl': item['imageUrl'],
         'tableNumber': item['tableNumber'],
         'originalTableNumber': tableNumber,
+        'timestamp': FieldValue.serverTimestamp(), // Timestamp eklendi
       });
     }
     await FirebaseFirestore.instance.collection('cart').get().then((snapshot) {
