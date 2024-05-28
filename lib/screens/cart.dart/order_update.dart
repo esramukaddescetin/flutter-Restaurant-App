@@ -43,63 +43,101 @@ class OrderUpdateScreen extends StatelessWidget {
               );
             }
             var items = snapshot.data!.docs;
-            return ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                var item = items[index];
-                return ListTile(
-                  leading: Image.network(
-                    item['imageUrl'],
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                  ),
-                  title: Row(
+            int totalQuantity = 0;
+            double totalPrice = 0.0;
+            for (var item in items) {
+              int quantity = item['quantity'] ?? 1;
+              double price = item['price'] ?? 0.0;
+              totalQuantity += quantity;
+              totalPrice += quantity * price;
+            }
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Text(
-                          item['name'],
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20),
                       Text(
-                        'Price: ${item['price']} \₺',
+                        'Total Quantity: $totalQuantity',
                         style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.indigo[900],
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Text(
+                        'Total Price: ${totalPrice.toStringAsFixed(2)} \₺',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                         ),
                       ),
                     ],
                   ),
-                  subtitle: Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.remove),
-                        onPressed: () {
-                          decreaseQuantity(item);
-                        },
-                      ),
-                      Text(item['quantity'].toString()), // Miktarı göster
-                      IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () {
-                          increaseQuantity(item);
-                        },
-                      ),
-                    ],
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      deleteItem(item);
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      var item = items[index];
+                      return ListTile(
+                        leading: Image.network(
+                          item['imageUrl'],
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                        title: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item['name'],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 20),
+                            Text(
+                              'Price: ${item['price']} \₺',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.indigo[900],
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.remove),
+                              onPressed: () {
+                                decreaseQuantity(item);
+                              },
+                            ),
+                            Text(item['quantity'].toString()), // Miktarı göster
+                            IconButton(
+                              icon: Icon(Icons.add),
+                              onPressed: () {
+                                increaseQuantity(item);
+                              },
+                            ),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            deleteItem(item);
+                          },
+                        ),
+                      );
                     },
                   ),
-                );
-              },
+                ),
+              ],
             );
           },
         ),
