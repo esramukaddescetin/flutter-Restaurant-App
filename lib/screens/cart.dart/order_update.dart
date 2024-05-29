@@ -13,15 +13,16 @@ class OrderUpdateScreen extends StatefulWidget {
 class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
   int totalQuantity = 0;
   double totalPrice = 0.0;
-  bool isLoading = false; // Loading state variable
-  List<Map<String, dynamic>> _modifiedOrders = []; // List to track modified orders
+  bool isLoading = false; // Yükleme durumu değişkeni
+  List<Map<String, dynamic>> _modifiedOrders =
+      []; // Değiştirilmiş siparişleri izlemek için liste
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Update Orders',
+          'Siparişleri Güncelle',
           style: TextStyle(
             color: Colors.blueGrey[900],
             fontFamily: 'PermanentMarker',
@@ -52,7 +53,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Center(
-                    child: Text('No orders found'),
+                    child: Text('Sipariş bulunamadı'),
                   );
                 }
 
@@ -75,7 +76,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Total Quantity: $totalQuantity',
+                            'Toplam Miktar: $totalQuantity',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -83,7 +84,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             ),
                           ),
                           Text(
-                            'Total Price: ${totalPrice.toStringAsFixed(2)} \₺',
+                            'Toplam Fiyat: ${totalPrice.toStringAsFixed(2)} \₺',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -105,18 +106,18 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                               height: 100,
                               fit: BoxFit.cover,
                             ),
-                            title: Row(
+                            title: Column(
+                              // Değişen kısım burası
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    item['name'] ?? '',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black54,
-                                    ),
+                                Text(
+                                  item['name'] ?? '',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54,
                                   ),
                                 ),
-                                const SizedBox(width: 20),
+                                const SizedBox(height: 4),
                                 Text(
                                   'Price: ${(item['price'] ?? 0.0).toString()} \₺',
                                   style: TextStyle(
@@ -162,7 +163,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             onPressed: () {
                               saveChanges();
                             },
-                            child: const Text('Save Changes'),
+                            child: const Text('Değişiklikleri Kaydet'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.blueGrey[900],
                               backgroundColor: Colors.teal[200],
@@ -172,7 +173,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             onPressed: () {
                               clearCart();
                             },
-                            child: const Text('Clear Cart'),
+                            child: const Text('Sepeti Temizle'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.blueGrey[900],
                               backgroundColor: Colors.red[200],
@@ -195,13 +196,13 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
     );
   }
 
-  // Function to increase quantity
+  // Fonksiyon: Miktarı arttır
   void increaseQuantity(DocumentSnapshot item) {
     int quantity = (item['quantity'] ?? 1) as int;
     var newQuantity = quantity + 1;
     item.reference.update({'quantity': newQuantity});
     setState(() {
-      // Track modified orders locally
+      // Değiştirilmiş siparişleri yerel olarak izle
       if (!_modifiedOrders.contains(item)) {
         _modifiedOrders.add({
           'id': item.id,
@@ -211,14 +212,14 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
     });
   }
 
-  // Function to decrease quantity
+  // Fonksiyon: Miktarı azalt
   void decreaseQuantity(DocumentSnapshot item) {
     int quantity = (item['quantity'] ?? 1) as int;
     if (quantity > 1) {
       var newQuantity = quantity - 1;
       item.reference.update({'quantity': newQuantity});
       setState(() {
-        // Track modified orders locally
+        // Değiştirilmiş siparişleri yerel olarak izle
         if (!_modifiedOrders.contains(item)) {
           _modifiedOrders.add({
             'id': item.id,
@@ -227,29 +228,29 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
         }
       });
     } else {
-      // If quantity is 1 or less, delete the order
+      // Eğer miktar 1'den az ise, siparişi sil
       item.reference.delete();
     }
   }
 
-  // Function to delete an order
+  // Fonksiyon: Bir siparişi sil
   void deleteOrder(DocumentSnapshot item) {
     item.reference.delete();
   }
 
-  // Function to clear the cart
+  // Fonksiyon: Sepeti temizle
   void clearCart() async {
     setState(() {
       isLoading = true;
     });
 
-    // Get all orders for the specific table
+    // Belirli masaya ait tüm siparişleri al
     var orders = await FirebaseFirestore.instance
         .collection('orders')
         .where('tableNumber', isEqualTo: widget.tableNumber)
         .get();
 
-    // Delete each order
+    // Her bir siparişi sil
     for (var order in orders.docs) {
       order.reference.delete();
     }
@@ -258,39 +259,41 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
       isLoading = false;
     });
 
-    // Show a snackbar indicating successful clearance
+    // Başarıyla temizlendiğini belirten bir Snackbar göster
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Cart cleared successfully!'),
+        content: Text('Sepet başarıyla temizlendi!'),
       ),
     );
   }
 
-  // Function to save changes to the database
+// Fonksiyon: Değişiklikleri kaydet
   void saveChanges() async {
     setState(() {
       isLoading = true;
     });
-
-    // Iterate through local modifications and update Firestore
+// Yerel değişiklikler üzerinde döngü yap ve Firestore'u güncelle
     for (var order in _modifiedOrders) {
-      await FirebaseFirestore.instance.collection('orders').doc(order['id']).update({
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(order['id'])
+          .update({
         'quantity': order['quantity'],
       });
     }
 
-    // Clear local modifications after saving changes
+// Değişiklikleri kaydettikten sonra yerel değişiklikleri temizle
     _modifiedOrders.clear();
 
     setState(() {
       isLoading = false;
     });
-        ScaffoldMessenger.of(context).showSnackBar(
+
+// Başarıyla kaydedildiğini belirten bir Snackbar göster
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Changes saved successfully!'),
+        content: Text('Değişiklikler başarıyla kaydedildi!'),
       ),
     );
   }
 }
-
-
