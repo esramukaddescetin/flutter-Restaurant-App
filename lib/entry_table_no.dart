@@ -11,6 +11,20 @@ class TableNumberPage extends StatefulWidget {
 class _TableNumberPageState extends State<TableNumberPage> {
   TextEditingController _tableNumberController = TextEditingController();
   String _errorMessage = '';
+  bool _isButtonEnabled = false; // Butonun etkinliğini takip etmek için bir değişken
+
+  @override
+  void initState() {
+    super.initState();
+    // TextField değiştiğinde kontrol edilmesi için listener ekleyin
+    _tableNumberController.addListener(() {
+      final isValidTableNumber =
+          int.tryParse(_tableNumberController.text) != null;
+      setState(() {
+        _isButtonEnabled = isValidTableNumber;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +66,7 @@ class _TableNumberPageState extends State<TableNumberPage> {
                   color: Colors.white,
                 ),
                 decoration: InputDecoration(
-                  labelText: 'Masa Numarası (0-20)',
+                  // labelText: 'Masa Numarası (0-20)',
                   labelStyle: const TextStyle(color: Colors.white),
                   border: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white),
@@ -70,27 +84,30 @@ class _TableNumberPageState extends State<TableNumberPage> {
               ),
               const SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: () {
-                  int tableNumber =
-                      int.tryParse(_tableNumberController.text) ?? 0;
-                  if (tableNumber > 20) {
-                    setState(() {
-                      _errorMessage = 'Masa numarası 20\'den büyük olamaz';
-                    });
-                  } else {
-                    setState(() {
-                      _errorMessage = '';
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QuickRequestsPage(
-                            tableNumber: tableNumber,
-                          ),
-                        ),
-                      );
-                    });
-                  }
-                },
+                onPressed: _isButtonEnabled // Butonun etkinliğini takip eden değişkeni kullanın
+                    ? () {
+                        int tableNumber =
+                            int.tryParse(_tableNumberController.text) ?? 0;
+                        if (tableNumber > 20) {
+                          setState(() {
+                            _errorMessage =
+                                'Masa numarası 20\'den büyük olamaz';
+                          });
+                        } else {
+                          setState(() {
+                            _errorMessage = '';
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => QuickRequestsPage(
+                                  tableNumber: tableNumber,
+                                ),
+                              ),
+                            );
+                          });
+                        }
+                      }
+                    : null, // Buton etkin değilse onPressed: null
                 child: const Text(
                   'Giriş Yap',
                   style: TextStyle(
