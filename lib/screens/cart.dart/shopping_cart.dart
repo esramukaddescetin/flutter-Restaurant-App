@@ -14,7 +14,7 @@ class ShoppingCartScreen extends StatefulWidget {
 }
 
 class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
-  bool orderSent = false;
+  // bool orderSent = true;
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +36,9 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             ),
             onPressed: () async {
               await sendOrdersToFirestore(widget.tableNumber);
-              setState(() {
-                orderSent = true;
-              });
+              // setState(() {
+              //   orderSent = true;
+              // });
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text('Orders sent to the waiter!'),
               ));
@@ -129,7 +129,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 },
               ),
             ),
-            if (!orderSent) // Sipariş gönderilmediyse butonu göster
+            // if (orderSent)
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
