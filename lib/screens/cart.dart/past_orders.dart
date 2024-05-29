@@ -15,14 +15,28 @@ class PastOrdersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Geçmiş Siparişler - Masa $tableNumber',
-          style: TextStyle(
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-            color: Colors.pink[800],
-            fontFamily: 'PermanentMarker',
-          ),
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Geçmiş Siparişler - ',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.pink[800],
+                fontFamily: 'PermanentMarker',
+              ),
+            ),
+            Text(
+              'Masa $tableNumber',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.pink[800],
+                fontFamily: 'PermanentMarker',
+              ),
+            ),
+          ],
         ),
         backgroundColor: Colors.teal[100],
       ),
