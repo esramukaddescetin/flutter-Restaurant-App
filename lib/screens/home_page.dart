@@ -66,7 +66,7 @@ class HomePage extends StatelessWidget {
                   if (result != null) {
                     Navigator.pushNamed(context, '/tableNumberPage');
                   } else {
-                    print("hata ile karşılaşıldu");
+                    print("hata ile karşılaşıldı");
                   }
                 },
                 child: ButtonEntry(giris: 'Üyeliksiz Devam Et'),
