@@ -44,16 +44,16 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(
+                  return const Center(
                     child: Text('No orders found'),
                   );
                 }
-
+ 
                 var items = snapshot.data!.docs;
                 totalQuantity = 0;
                 totalPrice = 0.0;
@@ -74,7 +74,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                         children: [
                           Text(
                             'Total Quantity: $totalQuantity',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -82,7 +82,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                           ),
                           Text(
                             'Total Price: ${totalPrice.toStringAsFixed(2)} \₺',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -108,13 +108,13 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                                 Expanded(
                                   child: Text(
                                     item['name'] ?? '',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black54,
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 20),
+                                const SizedBox(width: 20),
                                 Text(
                                   'Price: ${(item['price'] ?? 0.0).toString()} \₺',
                                   style: TextStyle(
@@ -127,7 +127,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             subtitle: Row(
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.remove),
+                                  icon: const Icon(Icons.remove),
                                   onPressed: () {
                                     decreaseQuantity(item);
                                   },
@@ -135,7 +135,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                                 Text((item['quantity'] ?? 1)
                                     .toString()), // Miktarı göster
                                 IconButton(
-                                  icon: Icon(Icons.add),
+                                  icon: const Icon(Icons.add),
                                   onPressed: () {
                                     increaseQuantity(item);
                                   },
@@ -143,7 +143,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                               ],
                             ),
                             trailing: IconButton(
-                              icon: Icon(Icons.delete),
+                              icon: const Icon(Icons.delete),
                               onPressed: () {
                                 deleteOrder(item);
                               },
@@ -161,7 +161,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             onPressed: () {
                               saveChanges();
                             },
-                            child: Text('Save Changes'),
+                            child: const Text('Save Changes'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.blueGrey[900],
                               backgroundColor:
@@ -172,7 +172,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             onPressed: () {
                               clearCart();
                             },
-                            child: Text('Clear Cart'),
+                            child: const Text('Clear Cart'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.blueGrey[900],
                               backgroundColor:
@@ -188,7 +188,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
             ),
           ),
           if (isLoading)
-            Center(
+            const Center(
               child: CircularProgressIndicator(),
             ),
         ],
@@ -240,7 +240,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Cart cleared successfully!'),
       ),
     );
@@ -259,7 +259,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Changes saved successfully!'),
       ),
     );

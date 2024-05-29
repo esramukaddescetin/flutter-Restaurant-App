@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/screens/cart.dart/order_list.dart';
+import 'package:restaurant_app/screens/cart.dart/past_orders.dart';
+
 
 import '../../utils/my_widgets.dart';
 
@@ -33,7 +35,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               color: Colors.blueGrey[900],
             ),
             onPressed: () async {
-              var cartItems = await FirebaseFirestore.instance.collection('cart').get();
+              var cartItems =
+                  await FirebaseFirestore.instance.collection('cart').get();
               if (cartItems.docs.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -62,20 +65,30 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OrderListScreen(tableNumber: widget.tableNumber),
-                    ),
-                  );
+                onPressed: () async {
+                  var orderItems = await FirebaseFirestore.instance
+                      .collection('orders')
+                      .where('tableNumber', isEqualTo: widget.tableNumber)
+                      .get();
+                  if (orderItems.docs.isEmpty) {
+                    showNoCurrentOrderDialog(context);
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            OrderListScreen(tableNumber: widget.tableNumber),
+                      ),
+                    );
+                  }
                 },
                 child: const Text('Siparişime Git'),
               ),
             ),
             Expanded(
               child: StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('cart').snapshots(),
+                stream:
+                    FirebaseFirestore.instance.collection('cart').snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -191,5 +204,39 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         ds.reference.delete();
       }
     });
+  }
+
+  void showNoCurrentOrderDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Güncel siparişiniz yok'),
+          content: const Text(
+              'Şu anda güncel bir siparişiniz bulunmamaktadır. Geçmiş siparişlerinizi görmek ister misiniz?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('İptal'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PastOrdersScreen(tableNumber: widget.tableNumber),
+                  ),
+                );
+              },
+              child: const Text('Geçmiş Siparişlerimi Gör'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
