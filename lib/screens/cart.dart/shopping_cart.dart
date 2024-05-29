@@ -14,8 +14,6 @@ class ShoppingCartScreen extends StatefulWidget {
 }
 
 class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
-  // bool orderSent = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,13 +33,21 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               color: Colors.blueGrey[900],
             ),
             onPressed: () async {
-              await sendOrdersToFirestore(widget.tableNumber);
-              // setState(() {
-              //   orderSent = true;
-              // });
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Orders sent to the waiter!'),
-              ));
+              var cartItems = await FirebaseFirestore.instance.collection('cart').get();
+              if (cartItems.docs.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Sepete öğe ekleyin!'),
+                  ),
+                );
+              } else {
+                await sendOrdersToFirestore(widget.tableNumber);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Orders sent to the waiter!'),
+                  ),
+                );
+              }
             },
           ),
         ],
@@ -53,6 +59,20 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         ),
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OrderListScreen(tableNumber: widget.tableNumber),
+                    ),
+                  );
+                },
+                child: const Text('Siparişime Git'),
+              ),
+            ),
             Expanded(
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance.collection('cart').snapshots(),
@@ -129,18 +149,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 },
               ),
             ),
-            // if (orderSent)
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OrderListScreen(tableNumber: widget.tableNumber),
-                    ),
-                  );
-                },
-                child: const Text('Siparişime Git'),
-              ),
           ],
         ),
       ),
@@ -175,7 +183,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         'quantity': item['quantity'],
         'imageUrl': item['imageUrl'],
         'tableNumber': tableNumber,
-        'timestamp': FieldValue.serverTimestamp(), 
+        'timestamp': FieldValue.serverTimestamp(),
       });
     }
     await FirebaseFirestore.instance.collection('cart').get().then((snapshot) {
