@@ -6,14 +6,21 @@ class PastOrdersScreen extends StatelessWidget {
 
   PastOrdersScreen({required this.tableNumber});
 
+  String formatTimestamp(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Geçmiş Siparişler',
+          'Geçmiş Siparişler - Masa $tableNumber',
           style: TextStyle(
-            color: Colors.blueGrey[900],
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Colors.pink[800],
             fontFamily: 'PermanentMarker',
           ),
         ),
@@ -27,70 +34,83 @@ class PastOrdersScreen extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
+        padding: const EdgeInsets.all(16.0),
         child: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection('completed_orders')
               .where('tableNumber', isEqualTo: tableNumber)
+              .orderBy('timestamp', descending: true)
               .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(
-                child: Text('Geçmiş siparişiniz bulunmamaktadır.'),
-              );
-            }
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Bir hata oluştu: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Center(child: Text('Henüz geçmiş sipariş yok.'));
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  var order = snapshot.data!.docs[index];
+                  var data = order.data() as Map<String, dynamic>;
+                  int quantity = data['quantity'] ?? 1;
+                  String timestamp = formatTimestamp(data['timestamp']);
 
-            var orders = snapshot.data!.docs;
-            return ListView.builder(
-              itemCount: orders.length,
-              itemBuilder: (context, index) {
-                var order = orders[index];
-                var data = order.data() as Map<String, dynamic>;
-
-                return ListTile(
-                  leading: data['imageUrl'] != null
-                      ? Image.network(
-                          data['imageUrl'],
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          width: 100,
-                          height: 100,
-                          color: Colors.grey,
-                          child: Icon(Icons.image, color: Colors.white),
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 0),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 16.0),
+                      leading: data['imageUrl'] != null
+                          ? Image.network(
+                              data['imageUrl'],
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            )
+                          : Container(
+                              width: 100,
+                              height: 100,
+                              color: Colors.grey,
+                              child: Icon(Icons.image, color: Colors.white),
+                            ),
+                      title: Text(
+                        data['name'] ?? '',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0,
+                          color: Colors.black87,
                         ),
-                  title: Text(
-                    data['name'],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54,
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4.0),
+                          Text(
+                            'Price: ${data['price']} \₺, Quantity: $quantity',
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          const SizedBox(height: 4.0),
+                          Text(
+                            timestamp,
+                            style: const TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.black45,
+                            ),
+                          ),
+                        ],
+                      ),
+                      isThreeLine: true,
                     ),
-                  ),
-                  subtitle: Text(
-                    'Price: ${data['price']} \₺, Quantity: ${data['quantity']}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.indigo[900],
-                    ),
-                  ),
-                  trailing: Text(
-                    data['timestamp'] != null
-                        ? (data['timestamp'] as Timestamp).toDate().toString()
-                        : 'N/A',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  ),
-                );
-              },
-            );
+                  );
+                },
+              );
+            }
           },
         ),
       ),

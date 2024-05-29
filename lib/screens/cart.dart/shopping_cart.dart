@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_app/screens/cart.dart/order_list.dart';
 import 'package:restaurant_app/screens/cart.dart/past_orders.dart';
 
-
 import '../../utils/my_widgets.dart';
 
 class ShoppingCartScreen extends StatefulWidget {
@@ -16,6 +15,8 @@ class ShoppingCartScreen extends StatefulWidget {
 }
 
 class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
+  double totalPrice = 0.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,8 +36,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               color: Colors.blueGrey[900],
             ),
             onPressed: () async {
-              var cartItems =
-                  await FirebaseFirestore.instance.collection('cart').get();
+              var cartItems = await FirebaseFirestore.instance.collection('cart').get();
               if (cartItems.docs.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -76,8 +76,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            OrderListScreen(tableNumber: widget.tableNumber),
+                        builder: (context) => OrderListScreen(tableNumber: widget.tableNumber),
                       ),
                     );
                   }
@@ -87,8 +86,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             ),
             Expanded(
               child: StreamBuilder(
-                stream:
-                    FirebaseFirestore.instance.collection('cart').snapshots(),
+                stream: FirebaseFirestore.instance.collection('cart').snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -101,63 +99,104 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     );
                   }
                   var items = snapshot.data!.docs;
-                  return ListView.builder(
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      var item = items[index];
-                      return ListTile(
-                        leading: Image.network(
-                          item['imageUrl'],
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                item['name'],
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black54,
+                  totalPrice = items.fold(0.0, (sum, item) {
+                    return sum + (item['price'] * item['quantity']);
+                  });
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            var item = items[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+                                leading: Image.network(
+                                  item['imageUrl'],
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                                title: Text(
+                                  item['name'],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.0,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 4.0),
+                                    Text(
+                                      'Price: ${item['price']} \₺',
+                                      style: const TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4.0),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.remove),
+                                          onPressed: () {
+                                            decreaseQuantity(item);
+                                          },
+                                        ),
+                                        Text(
+                                          item['quantity'].toString(),
+                                          style: const TextStyle(fontSize: 16.0),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.add),
+                                          onPressed: () {
+                                            increaseQuantity(item);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    deleteItem(item);
+                                  },
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 20),
+                            );
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
                             Text(
-                              'Price: ${item['price']} \₺',
+                              'Total Price:',
                               style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.indigo[900],
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueGrey[900],
+                              ),
+                            ),
+                            Text(
+                              '$totalPrice \₺',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueGrey[900],
                               ),
                             ),
                           ],
                         ),
-                        subtitle: Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove),
-                              onPressed: () {
-                                decreaseQuantity(item);
-                              },
-                            ),
-                            Text(item['quantity'].toString()), // Miktarı göster
-                            IconButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: () {
-                                increaseQuantity(item);
-                              },
-                            ),
-                          ],
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            deleteItem(item);
-                          },
-                        ),
-                      );
-                    },
+                      ),
+                    ],
                   );
                 },
               ),
@@ -169,16 +208,15 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 
   void increaseQuantity(DocumentSnapshot item) async {
-    int quantity = item['quantity'] ?? 1; // Varsayılan değer 1
+    int quantity = item['quantity'] ?? 1;
     await item.reference.update({'quantity': quantity + 1});
   }
 
   void decreaseQuantity(DocumentSnapshot item) async {
-    int quantity = item['quantity'] ?? 1; // Varsayılan değer 1
+    int quantity = item['quantity'] ?? 1;
     if (quantity > 1) {
       await item.reference.update({'quantity': quantity - 1});
     } else {
-      // Eğer miktar 1'den küçükse, ürünü sil
       await item.reference.delete();
     }
   }
@@ -227,8 +265,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        PastOrdersScreen(tableNumber: widget.tableNumber),
+                    builder: (context) => PastOrdersScreen(tableNumber: widget.tableNumber),
                   ),
                 );
               },
