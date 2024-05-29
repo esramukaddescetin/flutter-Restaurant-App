@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/screens/menu_page.dart';
-import '../../utils/my_widgets.dart';
 
 class OrderUpdateScreen extends StatefulWidget {
   final int tableNumber;
@@ -15,7 +13,8 @@ class OrderUpdateScreen extends StatefulWidget {
 class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
   int totalQuantity = 0;
   double totalPrice = 0.0;
-  bool isLoading = false; // Yükleme durumu için değişken
+  bool isLoading = false; // Loading state variable
+  List<Map<String, dynamic>> _modifiedOrders = []; // List to track modified orders
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +32,12 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
       body: Stack(
         children: [
           Container(
-            decoration: WidgetBackcolor(
-              Colors.white38,
-              Colors.teal,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.white38, Colors.teal],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
@@ -53,7 +55,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                     child: Text('No orders found'),
                   );
                 }
- 
+
                 var items = snapshot.data!.docs;
                 totalQuantity = 0;
                 totalPrice = 0.0;
@@ -132,8 +134,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                                     decreaseQuantity(item);
                                   },
                                 ),
-                                Text((item['quantity'] ?? 1)
-                                    .toString()), // Miktarı göster
+                                Text((item['quantity'] ?? 1).toString()),
                                 IconButton(
                                   icon: const Icon(Icons.add),
                                   onPressed: () {
@@ -164,8 +165,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             child: const Text('Save Changes'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.blueGrey[900],
-                              backgroundColor:
-                                  Colors.teal[200], // Butonun yazı rengi
+                              backgroundColor: Colors.teal[200],
                             ),
                           ),
                           ElevatedButton(
@@ -175,8 +175,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             child: const Text('Clear Cart'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.blueGrey[900],
-                              backgroundColor:
-                                  Colors.red[200], // Butonun yazı rengi
+                              backgroundColor: Colors.red[200],
                             ),
                           ),
                         ],
@@ -196,49 +195,70 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
     );
   }
 
-  void increaseQuantity(DocumentSnapshot item) async {
-    int quantity = (item['quantity'] ?? 1) as int; // Varsayılan değer 1
+  // Function to increase quantity
+  void increaseQuantity(DocumentSnapshot item) {
+    int quantity = (item['quantity'] ?? 1) as int;
     var newQuantity = quantity + 1;
-    await item.reference.update({'quantity': newQuantity});
-    setState(() {});
+    item.reference.update({'quantity': newQuantity});
+    setState(() {
+      // Track modified orders locally
+      if (!_modifiedOrders.contains(item)) {
+        _modifiedOrders.add({
+          'id': item.id,
+          'quantity': newQuantity,
+        });
+      }
+    });
   }
 
-  void decreaseQuantity(DocumentSnapshot item) async {
-    int quantity = (item['quantity'] ?? 1) as int; // Varsayılan değer 1
+  // Function to decrease quantity
+  void decreaseQuantity(DocumentSnapshot item) {
+    int quantity = (item['quantity'] ?? 1) as int;
     if (quantity > 1) {
       var newQuantity = quantity - 1;
-      await item.reference.update({'quantity': newQuantity});
+      item.reference.update({'quantity': newQuantity});
+      setState(() {
+        // Track modified orders locally
+        if (!_modifiedOrders.contains(item)) {
+          _modifiedOrders.add({
+            'id': item.id,
+            'quantity': newQuantity,
+          });
+        }
+      });
     } else {
-      // Eğer miktar 1'den küçükse, ürünü sil
-      await item.reference.delete();
+      // If quantity is 1 or less, delete the order
+      item.reference.delete();
     }
-    setState(() {});
   }
 
-  void deleteOrder(DocumentSnapshot item) async {
-    await item.reference.delete();
-    setState(() {});
+  // Function to delete an order
+  void deleteOrder(DocumentSnapshot item) {
+    item.reference.delete();
   }
 
+  // Function to clear the cart
   void clearCart() async {
     setState(() {
       isLoading = true;
     });
 
-    // Belirli masanın tüm siparişlerini silme
+    // Get all orders for the specific table
     var orders = await FirebaseFirestore.instance
         .collection('orders')
         .where('tableNumber', isEqualTo: widget.tableNumber)
         .get();
 
+    // Delete each order
     for (var order in orders.docs) {
-      await order.reference.delete();
+      order.reference.delete();
     }
 
     setState(() {
       isLoading = false;
     });
 
+    // Show a snackbar indicating successful clearance
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Cart cleared successfully!'),
@@ -246,22 +266,31 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
     );
   }
 
+  // Function to save changes to the database
   void saveChanges() async {
     setState(() {
       isLoading = true;
     });
 
-    // Değişiklikleri kaydetme işlemleri burada yapılabilir
-    // Bu örnekte veritabanına zaten güncellenen veriler kaydedildiği için bir işlem yapılmıyor
+    // Iterate through local modifications and update Firestore
+    for (var order in _modifiedOrders) {
+      await FirebaseFirestore.instance.collection('orders').doc(order['id']).update({
+        'quantity': order['quantity'],
+      });
+    }
+
+    // Clear local modifications after saving changes
+    _modifiedOrders.clear();
 
     setState(() {
       isLoading = false;
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
         content: Text('Changes saved successfully!'),
       ),
     );
   }
 }
+
+
