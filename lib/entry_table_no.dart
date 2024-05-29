@@ -12,12 +12,12 @@ class TableNumberPage extends StatefulWidget {
 class _TableNumberPageState extends State<TableNumberPage> {
   TextEditingController _tableNumberController = TextEditingController();
   String _errorMessage = '';
-  bool _isButtonEnabled = false; // Butonun etkinliğini takip etmek için bir değişken
+  bool _isButtonEnabled =
+      false; 
 
   @override
   void initState() {
     super.initState();
-    // TextField değiştiğinde kontrol edilmesi için listener ekleyin
     _tableNumberController.addListener(() {
       final isValidTableNumber =
           int.tryParse(_tableNumberController.text) != null;
@@ -85,32 +85,33 @@ class _TableNumberPageState extends State<TableNumberPage> {
               ),
               const SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: _isButtonEnabled // Butonun etkinliğini takip eden değişkeni kullanın
-                    ? () async {
-                        int tableNumber =
-                            int.tryParse(_tableNumberController.text) ?? 0;
-                        // Firestore sorgusu
-                        bool isTableExist = await checkTableExist(tableNumber);
-                        if (!isTableExist) {
-                          setState(() {
-                            _errorMessage =
-                                'Masa numarası mevcut değil';
-                          });
-                        } else {
-                          setState(() {
-                            _errorMessage = '';
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => QuickRequestsPage(
-                                  tableNumber: tableNumber,
-                                ),
-                              ),
-                            );
-                          });
-                        }
-                      }
-                    : null, // Buton etkin değilse onPressed: null
+                onPressed:
+                    _isButtonEnabled // Butonun etkinliğini takip eden değişkeni kullanın
+                        ? () async {
+                            int tableNumber =
+                                int.tryParse(_tableNumberController.text) ?? 0;
+                            // Firestore sorgusu
+                            bool isTableExist =
+                                await checkTableExist(tableNumber);
+                            if (!isTableExist) {
+                              setState(() {
+                                _errorMessage = 'Masa numarası mevcut değil';
+                              });
+                            } else {
+                              setState(() {
+                                _errorMessage = '';
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => QuickRequestsPage(
+                                      tableNumber: tableNumber,
+                                    ),
+                                  ),
+                                );
+                              });
+                            }
+                          }
+                        : null, // Buton etkin değilse onPressed: null
                 // Butonun etkin olması durumunda metin
                 child: const Text(
                   'Giriş Yap',

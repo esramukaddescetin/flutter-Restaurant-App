@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../utils/my_widgets.dart';
 
 class WaiterRequestPage extends StatelessWidget {
+  TextEditingController _titleController = TextEditingController();
+  TextEditingController _requestController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+        final int tableNumber = ModalRoute.of(context)?.settings.arguments as int;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Garsona Talep Yaz',
           style: TextStyle(
             color: Colors.white,
@@ -22,23 +27,25 @@ class WaiterRequestPage extends StatelessWidget {
           Colors.white60,
         ),
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Başlık',
                 style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              TextFormField(
-                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
-                decoration: InputDecoration(
+              ),
+              TextFormField(
+                controller: _titleController,
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
+                decoration: const InputDecoration(
                   hintText: 'Başlık girin',
                   hintStyle: TextStyle(
                     color: Colors.white,
@@ -52,29 +59,27 @@ class WaiterRequestPage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Talep',
                 style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
               TextFormField(
-                style: TextStyle(
+                controller: _requestController,
+                style: const TextStyle(
                   color: Colors.white,
                 ),
                 maxLines: 5,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Talebinizi girin',
                   hintStyle: TextStyle(
                     color: Colors.white,
                   ),
-                  border: OutlineInputBorder(
-                      //      borderSide: BorderSide(
-                      //      color: Colors.white,
-                      //  ),
-                      ),
+                  border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white),
                   ),
@@ -83,7 +88,7 @@ class WaiterRequestPage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor: MaterialStatePropertyAll(
@@ -91,21 +96,14 @@ class WaiterRequestPage extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  // Garsona talebi gönder
-                  // Buraya gönderme işlemleri eklenebilir
-                  // Örneğin, bir API'ye POST isteği yapabilirsiniz.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Talebiniz gönderildi!',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                  sendWaiterRequest(
+                    context,
+                    _titleController.text,
+                    _requestController.text,
+                    tableNumber, // tableNumber'ı burada ekleyin
                   );
                 },
-                child: Text(
+                child: const Text(
                   'Garsona Gönder',
                   style: TextStyle(
                     color: Colors.brown,
@@ -118,11 +116,43 @@ class WaiterRequestPage extends StatelessWidget {
       ),
     );
   }
-}
 
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: WaiterRequestPage(),
-  ));
+  void sendWaiterRequest(
+    BuildContext context,
+    String title,
+    String request,
+    int tableNumber, // tableNumber'ı parametre olarak alın
+  ) {
+    // Veritabanına talebi ekle
+    FirebaseFirestore.instance.collection('waiter_requests').add({
+      'tableNumber': tableNumber,
+      'title': title,
+      'request': request,
+      'timestamp': Timestamp.now(),
+    }).then((value) {
+      // Talep başarıyla gönderildiğinde kullanıcıya geribildirim ver
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Talebiniz gönderildi!',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    }).catchError((error) {
+      // Hata durumunda kullanıcıya geribildirim ver
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Talep gönderirken bir hata oluştu. Lütfen tekrar deneyin.',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    });
+  }
 }

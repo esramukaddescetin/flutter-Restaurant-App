@@ -182,7 +182,7 @@ class MenuScreen extends StatelessWidget {
           'imageUrl': item['imageUrl'],
           'ingredients': item['ingredients'],
           'quantity': 1,
-          'tableNumber': tableNumber, // Table number'ı ekleyin
+          'tableNumber': tableNumber, 
         });
       }
       _showSuccessDialog();

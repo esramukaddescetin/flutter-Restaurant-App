@@ -37,17 +37,17 @@ class LoginPage extends StatelessWidget {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),
-        labelStyle: TextStyle(color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.white),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: Colors.white),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: Colors.white),
         ),
       ),
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
     );
   }
 
@@ -73,8 +73,8 @@ class LoginPage extends StatelessWidget {
                         'assets/images/restaurant.png',
                         height: 110,
                       ),
-                      SizedBox(height: 24),
-                      Text(
+                      const SizedBox(height: 24),
+                      const Text(
                         'Welcome back!',
                         style: TextStyle(
                           fontSize: 24,
@@ -82,19 +82,19 @@ class LoginPage extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 8),
-                      Text(
+                      const SizedBox(height: 8),
+                      const Text(
                         'Sign in to continue',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 32),
+                      const SizedBox(height: 32),
                       inputField('Email', Icons.email, _tEmail),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       inputField('Password', Icons.lock, _tPassword),
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () {
                           String email = _tEmail.text.trim();
@@ -103,7 +103,7 @@ class LoginPage extends StatelessWidget {
                           // E-posta ve şifre boş mu kontrol edilir
                           if (email.isEmpty || password.isEmpty) {
                             // Eğer boşluk kaldırılmış e-posta ve şifre boşsa, hata mesajı gösterilir
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                               content: Text('Please enter email and password.'),
                             ));
                           } else {
@@ -111,8 +111,8 @@ class LoginPage extends StatelessWidget {
                             locator.get<AuthService>().signIn(context, email, password);
                           }
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -137,21 +137,21 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       TextButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/forgotpasswordPage');
                         },
-                        child: Text(
+                        child: const Text(
                           'Forgot password?',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          const Text(
                             "Don't have an account? ",
                             style: TextStyle(color: Colors.white),
                           ),
@@ -159,7 +159,7 @@ class LoginPage extends StatelessWidget {
                             onPressed: () {
                               Navigator.pushNamed(context, '/signPage');
                             },
-                            child: Text(
+                            child: const Text(
                               'Sign Up',
                               style: TextStyle(color: Colors.white),
                             ),
@@ -181,7 +181,7 @@ class LoginPage extends StatelessWidget {
               ),
             ),
           ),
-          IconBack(),
+          const IconBack(),
         ],
       ),
     );
