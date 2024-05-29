@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_app/screens/cart.dart/shopping_cart.dart';
 import 'package:restaurant_app/screens/quick_requests.dart';
 import 'package:restaurant_app/utils/my_widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TableNumberPage extends StatefulWidget {
   @override
@@ -85,13 +86,15 @@ class _TableNumberPageState extends State<TableNumberPage> {
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: _isButtonEnabled // Butonun etkinliğini takip eden değişkeni kullanın
-                    ? () {
+                    ? () async {
                         int tableNumber =
                             int.tryParse(_tableNumberController.text) ?? 0;
-                        if (tableNumber > 20) {
+                        // Firestore sorgusu
+                        bool isTableExist = await checkTableExist(tableNumber);
+                        if (!isTableExist) {
                           setState(() {
                             _errorMessage =
-                                'Masa numarası 20\'den büyük olamaz';
+                                'Masa numarası mevcut değil';
                           });
                         } else {
                           setState(() {
@@ -108,6 +111,7 @@ class _TableNumberPageState extends State<TableNumberPage> {
                         }
                       }
                     : null, // Buton etkin değilse onPressed: null
+                // Butonun etkin olması durumunda metin
                 child: const Text(
                   'Giriş Yap',
                   style: TextStyle(
@@ -115,6 +119,7 @@ class _TableNumberPageState extends State<TableNumberPage> {
                     fontSize: 20.0,
                   ),
                 ),
+                // Butonun stilini belirleyen kısım
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     vertical: 15.0,
@@ -134,6 +139,15 @@ class _TableNumberPageState extends State<TableNumberPage> {
   void dispose() {
     _tableNumberController.dispose();
     super.dispose();
+  }
+
+  // Firestore sorgusu için fonksiyon
+  Future<bool> checkTableExist(int tableNumber) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('tables')
+        .where('tableNumber', isEqualTo: tableNumber)
+        .get();
+    return querySnapshot.docs.isNotEmpty;
   }
 }
 
