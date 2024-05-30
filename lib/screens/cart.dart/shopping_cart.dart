@@ -1,12 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/screens/cart.dart/order_list.dart';
 
 import '../../utils/my_widgets.dart';
 
-class ShoppingCartScreen extends StatelessWidget {
+class ShoppingCartScreen extends StatefulWidget {
   final int tableNumber;
 
   ShoppingCartScreen({required this.tableNumber});
+
+  @override
+  _ShoppingCartScreenState createState() => _ShoppingCartScreenState();
+}
+
+class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
+  bool orderSent = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,9 +34,12 @@ class ShoppingCartScreen extends StatelessWidget {
               Icons.send,
               color: Colors.blueGrey[900],
             ),
-            onPressed: () {
-              sendOrdersToFirestore(tableNumber);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            onPressed: () async {
+              await sendOrdersToFirestore(widget.tableNumber);
+              setState(() {
+                orderSent = true;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text('Orders sent to the waiter!'),
               ));
             },
@@ -39,73 +51,97 @@ class ShoppingCartScreen extends StatelessWidget {
           Colors.white38,
           Colors.teal,
         ),
-        child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('cart').snapshots(),
-          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(
-                child: Text('Shopping cart is empty'),
-              );
-            }
-            var items = snapshot.data!.docs;
-            return ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                var item = items[index];
-                return ListTile(
-                  leading: Image.network(
-                    item['imageUrl'],
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                  ),
-                  title: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          item['name'],
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black54,
-                          ),
+        child: Column(
+          children: [
+            Expanded(
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance.collection('cart').snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(
+                      child: Text('Shopping cart is empty'),
+                    );
+                  }
+                  var items = snapshot.data!.docs;
+                  return ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      var item = items[index];
+                      return ListTile(
+                        leading: Image.network(
+                          item['imageUrl'],
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
                         ),
-                      ),
-                      SizedBox(width: 20),
-                      Text(
-                        'Price: ${item['price']} \₺',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.indigo[900],
+                        title: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item['name'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Text(
+                              'Price: ${item['price']} \₺',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.indigo[900],
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  subtitle: Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.remove),
-                        onPressed: () {
-                          decreaseQuantity(item);
-                        },
-                      ),
-                      Text(item['quantity'].toString()), // Miktarı göster
-                      IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () {
-                          increaseQuantity(item);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
+                        subtitle: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: () {
+                                decreaseQuantity(item);
+                              },
+                            ),
+                            Text(item['quantity'].toString()), // Miktarı göster
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () {
+                                increaseQuantity(item);
+                              },
+                            ),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            deleteItem(item);
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            if (!orderSent) // Sipariş gönderilmediyse butonu göster
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OrderListScreen(tableNumber: widget.tableNumber),
+                    ),
+                  );
+                },
+                child: const Text('Siparişime Git'),
+              ),
+          ],
         ),
       ),
     );
@@ -126,7 +162,11 @@ class ShoppingCartScreen extends StatelessWidget {
     }
   }
 
-  void sendOrdersToFirestore(int tableNumber) async {
+  void deleteItem(DocumentSnapshot item) async {
+    await item.reference.delete();
+  }
+
+  Future<void> sendOrdersToFirestore(int tableNumber) async {
     final cartItems = await FirebaseFirestore.instance.collection('cart').get();
     for (var item in cartItems.docs) {
       await FirebaseFirestore.instance.collection('orders').add({
@@ -134,9 +174,8 @@ class ShoppingCartScreen extends StatelessWidget {
         'price': item['price'],
         'quantity': item['quantity'],
         'imageUrl': item['imageUrl'],
-        'tableNumber': item['tableNumber'], // Siparişin orijinal masası
-        'originalTableNumber':
-            tableNumber, // Siparişin hangi masaya ait olduğunu belirt
+        'tableNumber': tableNumber,
+        'timestamp': FieldValue.serverTimestamp(), 
       });
     }
     await FirebaseFirestore.instance.collection('cart').get().then((snapshot) {
