@@ -56,9 +56,9 @@ class AuthService {
           .collection('users')
           .doc(userCredential.user!.uid)
           .get();
-      String role = snapshot.get('role');
+      dynamic role = snapshot.get('roles');
 
-      if (role == 'user') {
+      if (role is List<dynamic> && role.contains('User')) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => TableNumberPage()),

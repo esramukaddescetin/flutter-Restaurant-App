@@ -6,7 +6,7 @@ import 'package:restaurant_app/screens/cart.dart/shopping_cart.dart';
 import 'package:restaurant_app/screens/menu_page.dart';
 import 'package:restaurant_app/screens/payment_page.dart';
 import 'package:restaurant_app/screens/quick_requests.dart';
-import 'package:restaurant_app/screens/reservation_page.dart';
+import 'package:restaurant_app/screens/reservation/reservation_page.dart';
 import 'package:restaurant_app/screens/signup.dart';
 import 'package:restaurant_app/screens/waiter_request.dart';
 
@@ -15,6 +15,8 @@ import 'firebase_options.dart';
 import 'screens/forgot_password.dart';
 import 'screens/home_page.dart';
 import 'screens/login_page.dart';
+import 'screens/quick_requests.dart';
+import 'screens/signup.dart';
 import 'services/provider/auth_provider.dart';
 import 'utils/locator.dart';
 

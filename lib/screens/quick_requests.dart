@@ -220,7 +220,6 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
     );
   }
 
-// Firebase'e bildirim gönderme fonksiyonu
   void sendNotificationToFirebase(
       int tableNumber, String notificationMessage) async {
     try {
