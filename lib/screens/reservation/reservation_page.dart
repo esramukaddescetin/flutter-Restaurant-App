@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:restaurant_app/phone_input_formatter.dart';
-import 'package:restaurant_app/utils/my_widgets.dart';
+import 'package:flutter/services.dart';
 
 class ReservationPage extends StatefulWidget {
   @override
-  State<ReservationPage> createState() => _ReservationPageState();
+  _ReservationPageState createState() => _ReservationPageState();
 }
 
 class _ReservationPageState extends State<ReservationPage> {
@@ -16,6 +14,7 @@ class _ReservationPageState extends State<ReservationPage> {
   final TextEditingController _nameController = TextEditingController();
   String? _selectedTable;
   List<String> _tables = [];
+  List<TimeOfDay> _availableTimes = [];
 
   @override
   void initState() {
@@ -24,11 +23,37 @@ class _ReservationPageState extends State<ReservationPage> {
   }
 
   Future<void> _fetchTables() async {
-    final querySnapshot = await FirebaseFirestore.instance.collection('tables').get();
-    final tables = querySnapshot.docs.map((doc) => doc.id).toList();
+    final tablesSnapshot =
+        await FirebaseFirestore.instance.collection('tables').get();
     setState(() {
-      _tables = tables;
+      _tables = tablesSnapshot.docs
+          .map((doc) => doc['tableNumber'].toString())
+          .toList();
     });
+  }
+
+  Future<List<DateTime>> _getReservedTimes(DateTime selectedDate) async {
+    final reservationsSnapshot = await FirebaseFirestore.instance
+        .collection('reservations')
+        .where('dateTime',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(selectedDate))
+        .where('dateTime',
+            isLessThan:
+                Timestamp.fromDate(selectedDate.add(const Duration(days: 1))))
+        .get();
+
+    final reservedTimes = reservationsSnapshot.docs.map((doc) {
+      final reservationDateTime = (doc['dateTime'] as Timestamp).toDate();
+      return DateTime(
+        reservationDateTime.year,
+        reservationDateTime.month,
+        reservationDateTime.day,
+        reservationDateTime.hour,
+        reservationDateTime.minute,
+      );
+    }).toList();
+
+    return reservedTimes;
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -40,95 +65,111 @@ class _ReservationPageState extends State<ReservationPage> {
     );
 
     if (pickedDate != null) {
-      final available = await _isDateAvailable(pickedDate);
-      if (available) {
-        setState(() {
-          _selectedDate = pickedDate;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Selected date is fully booked")),
-        );
+      final reservedTimes = await _getReservedTimes(pickedDate);
+
+      setState(() {
+        _selectedDate = pickedDate;
+        _availableTimes = _generateAvailableTimes(reservedTimes);
+        _selectedTime = null; // Reset selected time when date changes
+      });
+    }
+  }
+
+  List<TimeOfDay> _generateAvailableTimes(List<DateTime> reservedTimes) {
+    final allTimes =
+        List.generate(24, (index) => TimeOfDay(hour: index, minute: 0));
+    final availableTimes = <TimeOfDay>[];
+
+    for (final time in allTimes) {
+      final dateTime = DateTime(_selectedDate!.year, _selectedDate!.month,
+          _selectedDate!.day, time.hour, time.minute);
+      if (!reservedTimes.any((reservedTime) => dateTime == reservedTime)) {
+        availableTimes.add(time);
       }
     }
-  }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(hour: 9, minute: 0),
-      builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null && picked.hour >= 9 && picked.hour <= 23) {
-      final available = await _isTimeAvailable(_selectedDate!, picked);
-      if (available) {
-        setState(() {
-          _selectedTime = picked;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Selected time is fully booked")),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please select a time between 09:00 and 23:00")),
-      );
-    }
-  }
-
-  Future<bool> _isDateAvailable(DateTime date) async {
-    final docSnapshot = await FirebaseFirestore.instance
-        .collection('reservations')
-        .doc('${date.year}-${date.month}-${date.day}')
-        .get();
-    if (!docSnapshot.exists) {
-      return true;
-    }
-    final data = docSnapshot.data()!;
-    return data.length < 24; // Assuming max 24 reservations per day
-  }
-
-  Future<bool> _isTimeAvailable(DateTime date, TimeOfDay time) async {
-    final docSnapshot = await FirebaseFirestore.instance
-        .collection('reservations')
-        .doc('${date.year}-${date.month}-${date.day}')
-        .get();
-    if (!docSnapshot.exists) {
-      return true;
-    }
-    final data = docSnapshot.data()!;
-    return !data.containsKey('${time.hour}:${time.minute}');
+    return availableTimes;
   }
 
   Future<void> _makeReservation() async {
-    if (_selectedDate == null || _selectedTime == null || _phoneController.text.isEmpty || _nameController.text.isEmpty || _selectedTable == null) {
+    if (_selectedDate == null ||
+        _selectedTime == null ||
+        _phoneController.text.isEmpty ||
+        _selectedTable == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please fill all the fields")),
+        const SnackBar(content: Text("Please fill all the fields")),
       );
       return;
     }
-    final dateKey = '${_selectedDate!.year}-${_selectedDate!.month}-${_selectedDate!.day}';
-    final timeKey = '${_selectedTime!.hour}:${_selectedTime!.minute}';
+
+    final dateTime = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      _selectedTime!.hour,
+      _selectedTime!.minute,
+    );
+
+    final isAvailable = await _checkAvailability(dateTime, _selectedTable!);
+
+    if (!isAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                "The selected table is already reserved for this time slot")),
+      );
+      return;
+    }
 
     final reservationData = {
-      'name': _nameController.text,
       'phone': _phoneController.text,
-      'time': timeKey,
+      'dateTime': Timestamp.fromDate(dateTime),
       'table': _selectedTable,
+      'name': _nameController.text,
     };
 
-    final docRef = FirebaseFirestore.instance.collection('reservations').doc(dateKey);
-    await docRef.set({timeKey: reservationData}, SetOptions(merge: true));
+    await FirebaseFirestore.instance
+        .collection('reservations')
+        .add(reservationData);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Reservation made successfully")),
+      const SnackBar(content: Text("Reservation made successfully")),
     );
+
+    setState(() {
+      _selectedDate = null;
+      _selectedTime = null;
+      _phoneController.clear();
+      _nameController.clear();
+      _selectedTable = null;
+    });
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        _selectedTime = pickedTime;
+      });
+    }
+  }
+
+  Future<bool> _checkAvailability(DateTime dateTime, String table) async {
+    final reservationsSnapshot = await FirebaseFirestore.instance
+        .collection('reservations')
+        .where('table', isEqualTo: table)
+        .where('dateTime',
+            isGreaterThanOrEqualTo:
+                Timestamp.fromDate(dateTime.subtract(const Duration(hours: 1))))
+        .where('dateTime',
+            isLessThanOrEqualTo:
+                Timestamp.fromDate(dateTime.add(const Duration(hours: 1))))
+        .get();
+
+    return reservationsSnapshot.docs.isEmpty;
   }
 
   @override
@@ -136,157 +177,169 @@ class _ReservationPageState extends State<ReservationPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          'Rezervasyon Yap',
+        title: const Text(
+          'Make a Reservation',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.brown[400],
       ),
       body: Container(
-        decoration: WidgetBackcolor(Colors.brown, Colors.white70),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.brown, Colors.white70],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Rezervasyon Detayları',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _nameController,
-                style: TextStyle(color: Colors.white70),
-                decoration: buildInputDecoration(
-                  'İsim',
-                  '',
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Reservation Details',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(10),
-                  PhoneInputFormatter(),
-                ],
-                style: TextStyle(color: Colors.white70),
-                decoration: buildInputDecoration(
-                  'Telefon Numarası',
-                  '',
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _nameController,
+                  style: const TextStyle(color: Colors.white70),
+                  decoration: const InputDecoration(
+                    labelText: 'Name',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white70),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                style: TextStyle(color: Colors.white70),
-                decoration: buildInputDecoration(
-                  _selectedDate == null
-                      ? 'Tarih Seçilmedi'
-                      : 'Seçilen Tarih: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-                  '',
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(10),
+                  ],
+                  style: const TextStyle(color: Colors.white70),
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white70),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
                 ),
-                readOnly: true,
-              ),
-              ElevatedButton(
-                onPressed: () => _selectDate(context),
-                child: Text('Tarih Seç', style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.brown[200],
+                const SizedBox(height: 10),
+                TextFormField(
+                  style: const TextStyle(color: Colors.white70),
+                  decoration: InputDecoration(
+                    labelText: _selectedDate == null
+                        ? 'Date not selected'
+                        : 'Selected Date: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white70),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  readOnly: true,
                 ),
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                style: TextStyle(color: Colors.white70),
-                decoration: buildInputDecoration(
-                  _selectedTime == null
-                      ? 'Saat Seç'
-                      : 'Seçilen Saat: ${_selectedTime!.hour}:${_selectedTime!.minute}',
-                  '',
+                ElevatedButton(
+                  onPressed: () => _selectDate(context),
+                  child: const Text('Select Date',
+                      style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.brown[200],
+                  ),
                 ),
-                readOnly: true,
-              ),
-              ElevatedButton(
-                onPressed: () => _selectTime(context),
-                child: Text('Saat Seç', style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.brown[200],
+                const SizedBox(height: 10),
+                DropdownButtonFormField<TimeOfDay>(
+                  value: _selectedTime,
+                  items: _availableTimes.map((time) {
+                    return DropdownMenuItem(
+                      value: time,
+                      child: Text(
+                        '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedTime = value;
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Select Time',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white70),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  style: const TextStyle(color: Colors.white70),
                 ),
-              ),
-              SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                value: _selectedTable,
-                items: _tables
-                    .map((table) => DropdownMenuItem<String>(
-                          value: table,
-                          child: Text('Masa $table'),
-                        ))
-                    .toList(),
-                onChanged: (value) async {
-                  final available = await _isTableAvailable(_selectedDate, _selectedTime, value);
-                  if (available) {
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  value: _selectedTable,
+                  items: _tables.map((table) {
+                    return DropdownMenuItem(
+                      value: table,
+                      child: Text(
+                        'Table $table',
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
                     setState(() {
                       _selectedTable = value;
                     });
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Selected table is fully booked at the selected time")),
-                    );
-                  }
-                },
-                decoration: buildInputDecoration('Masa Numarası', ''),
-              ),
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _makeReservation,
-                child: Text(
-                  'Rezervasyon Yap',
-                  style: TextStyle(color: Colors.white),
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Select Table',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white70),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  style: const TextStyle(color: Colors.white70),
                 ),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                  backgroundColor: Colors.brown[300],
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: _makeReservation,
+                  child: const Text(
+                    'Make Reservation',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 12),
+                    backgroundColor: Colors.brown[300],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
-  Future<bool> _isTableAvailable(DateTime? date, TimeOfDay? time, String? table) async {
-    if (date == null || time == null || table == null) {
-      return false;
-    }
-
-    final dateKey = '${date.year}-${date.month}-${date.day}';
-    final timeKey = '${time.hour}:${time.minute}';
-    final docSnapshot = await FirebaseFirestore.instance
-        .collection('reservations')
-        .doc(dateKey)
-        .get();
-
-    if (!docSnapshot.exists) {
-      return true;
-    }
-
-    final data = docSnapshot.data()!;
-    if (data.containsKey(timeKey)) {
-      final reservations = data[timeKey] as Map<String, dynamic>;
-      return reservations['table'] != table;
-    }
-
-    return true;
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: ReservationPage(),
-  ));
 }
