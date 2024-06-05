@@ -63,6 +63,7 @@ class RestaurantApp extends StatelessWidget {
     LoadAll();
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
         '/': (context) => HomePage(),

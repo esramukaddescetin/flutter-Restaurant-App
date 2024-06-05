@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
                 radius: 110,
                 backgroundColor: Colors.brown[300],
                 backgroundImage:
-                    AssetImage('assets/images/restaurant_logo.jpg'),
+                    const AssetImage('assets/images/restaurant_logo.jpg'),
               ),
               Text(
                 'PİGOME RESTORAN',
@@ -30,7 +30,7 @@ class HomePage extends StatelessWidget {
                   fontFamily: 'Yellowtail',
                 ),
               ),
-              Center(
+              const Center(
                 child: Text(
                   '"Her Yemeğin Arkasında Bir Gülümseme Var"',
                   style: TextStyle(
@@ -43,22 +43,22 @@ class HomePage extends StatelessWidget {
               Container(
                 width: 300,
                 height: 18,
-                child: Divider(color: Colors.brown),
+                child: const Divider(color: Colors.brown),
               ),
-              CardEntry(
+              const CardEntry(
                 icon: Icons.mail,
                 text: 'pigome@restaurant.com',
               ),
-              SizedBox(
+              const SizedBox(
                 height: 6,
               ),
-              CardEntry(icon: Icons.phone, text: '0370 654 96 52'),
-              SizedBox(height: 10),
+              const CardEntry(icon: Icons.phone, text: '0370 654 96 52'),
+              const SizedBox(height: 10),
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/loginPage');
                 },
-                child: ButtonEntry(giris: 'Müşteri Girişi'),
+                child: const ButtonEntry(giris: 'Müşteri Girişi'),
               ),
               TextButton(
                 onPressed: () async {
@@ -69,7 +69,7 @@ class HomePage extends StatelessWidget {
                     print("hata ile karşılaşıldı");
                   }
                 },
-                child: ButtonEntry(giris: 'Üyeliksiz Devam Et'),
+                child: const ButtonEntry(giris: 'Üyeliksiz Devam Et'),
               ),
             ],
           ),

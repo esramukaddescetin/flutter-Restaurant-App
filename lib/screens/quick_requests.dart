@@ -138,7 +138,7 @@ class _QuickRequestsPageState extends State<QuickRequestsPage> {
                   const SizedBox(height: 10),
                   buildQuickRequestButton(Icons.event_note, 'Garsona Talep Yaz',
                       writeRequestButtonColor, () {
-                    Navigator.pushNamed(context, '/waiterRequestPage');
+                    Navigator.pushNamed(context, '/waiterRequestPage', arguments: widget.tableNumber);
                   }),
                   const SizedBox(height: 10),
                   buildQuickRequestButton(

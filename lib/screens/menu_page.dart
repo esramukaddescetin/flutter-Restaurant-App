@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/screens/cart.dart/past_orders.dart';
 import 'package:restaurant_app/screens/cart.dart/shopping_cart.dart';
 
 import '../utils/my_widgets.dart';
@@ -20,7 +21,22 @@ class MenuScreen extends StatelessWidget {
         backgroundColor: Colors.deepPurple[300],
         actions: [
           IconButton(
-            icon: Icon(
+            icon: const Icon(
+              Icons.history, // Geçmiş siparişlere giden ikon
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      PastOrdersScreen(tableNumber: tableNumber),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(
               Icons.shopping_cart,
               color: Colors.white,
             ),
@@ -28,9 +44,9 @@ class MenuScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ShoppingCartScreen(
-                        tableNumber:
-                            tableNumber)), // ShoppingCartScreen'a yönlendirme yapıldı
+                  builder: (context) =>
+                      ShoppingCartScreen(tableNumber: tableNumber),
+                ),
               );
             },
           ),
@@ -91,7 +107,7 @@ class MenuScreen extends StatelessWidget {
                         ),
                         title: Text(
                           item['name'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black54,
                           ),
@@ -101,14 +117,14 @@ class MenuScreen extends StatelessWidget {
                           children: [
                             Text(
                               'Ingredients: ${item['ingredients'].join(', ')}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.blueGrey,
                               ),
                             ),
                             Text(
                               'Price: ${item['price']} \₺',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.teal,
                               ),

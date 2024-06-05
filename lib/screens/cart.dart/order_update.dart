@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/screens/menu_page.dart';
-import '../../utils/my_widgets.dart';
 
 class OrderUpdateScreen extends StatefulWidget {
   final int tableNumber;
@@ -15,14 +13,16 @@ class OrderUpdateScreen extends StatefulWidget {
 class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
   int totalQuantity = 0;
   double totalPrice = 0.0;
-  bool isLoading = false; // Yükleme durumu için değişken
+  bool isLoading = false; // Yükleme durumu değişkeni
+  List<Map<String, dynamic>> _modifiedOrders =
+      []; // Değiştirilmiş siparişleri izlemek için liste
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Update Orders',
+          'Siparişleri Güncelle',
           style: TextStyle(
             color: Colors.blueGrey[900],
             fontFamily: 'PermanentMarker',
@@ -33,9 +33,12 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
       body: Stack(
         children: [
           Container(
-            decoration: WidgetBackcolor(
-              Colors.white38,
-              Colors.teal,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.white38, Colors.teal],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
@@ -44,13 +47,13 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(
-                    child: Text('No orders found'),
+                  return const Center(
+                    child: Text('Sipariş bulunamadı'),
                   );
                 }
 
@@ -73,16 +76,16 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Total Quantity: $totalQuantity',
-                            style: TextStyle(
+                            'Toplam Miktar: $totalQuantity',
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
                           ),
                           Text(
-                            'Total Price: ${totalPrice.toStringAsFixed(2)} \₺',
-                            style: TextStyle(
+                            'Toplam Fiyat: ${totalPrice.toStringAsFixed(2)} \₺',
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -103,18 +106,18 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                               height: 100,
                               fit: BoxFit.cover,
                             ),
-                            title: Row(
+                            title: Column(
+                              // Değişen kısım burası
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    item['name'] ?? '',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black54,
-                                    ),
+                                Text(
+                                  item['name'] ?? '',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54,
                                   ),
                                 ),
-                                SizedBox(width: 20),
+                                const SizedBox(height: 4),
                                 Text(
                                   'Price: ${(item['price'] ?? 0.0).toString()} \₺',
                                   style: TextStyle(
@@ -127,15 +130,14 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             subtitle: Row(
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.remove),
+                                  icon: const Icon(Icons.remove),
                                   onPressed: () {
                                     decreaseQuantity(item);
                                   },
                                 ),
-                                Text((item['quantity'] ?? 1)
-                                    .toString()), // Miktarı göster
+                                Text((item['quantity'] ?? 1).toString()),
                                 IconButton(
-                                  icon: Icon(Icons.add),
+                                  icon: const Icon(Icons.add),
                                   onPressed: () {
                                     increaseQuantity(item);
                                   },
@@ -143,7 +145,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                               ],
                             ),
                             trailing: IconButton(
-                              icon: Icon(Icons.delete),
+                              icon: const Icon(Icons.delete),
                               onPressed: () {
                                 deleteOrder(item);
                               },
@@ -161,22 +163,20 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                             onPressed: () {
                               saveChanges();
                             },
-                            child: Text('Save Changes'),
+                            child: const Text('Değişiklikleri Kaydet'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.blueGrey[900],
-                              backgroundColor:
-                                  Colors.teal[200], // Butonun yazı rengi
+                              backgroundColor: Colors.teal[200],
                             ),
                           ),
                           ElevatedButton(
                             onPressed: () {
                               clearCart();
                             },
-                            child: Text('Clear Cart'),
+                            child: const Text('Sepeti Temizle'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.blueGrey[900],
-                              backgroundColor:
-                                  Colors.red[200], // Butonun yazı rengi
+                              backgroundColor: Colors.red[200],
                             ),
                           ),
                         ],
@@ -188,7 +188,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
             ),
           ),
           if (isLoading)
-            Center(
+            const Center(
               child: CircularProgressIndicator(),
             ),
         ],
@@ -196,71 +196,103 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
     );
   }
 
-  void increaseQuantity(DocumentSnapshot item) async {
-    int quantity = (item['quantity'] ?? 1) as int; // Varsayılan değer 1
+  // Fonksiyon: Miktarı arttır
+  void increaseQuantity(DocumentSnapshot item) {
+    int quantity = (item['quantity'] ?? 1) as int;
     var newQuantity = quantity + 1;
-    await item.reference.update({'quantity': newQuantity});
-    setState(() {});
+    item.reference.update({'quantity': newQuantity});
+    setState(() {
+      // Değiştirilmiş siparişleri yerel olarak izle
+      if (!_modifiedOrders.contains(item)) {
+        _modifiedOrders.add({
+          'id': item.id,
+          'quantity': newQuantity,
+        });
+      }
+    });
   }
 
-  void decreaseQuantity(DocumentSnapshot item) async {
-    int quantity = (item['quantity'] ?? 1) as int; // Varsayılan değer 1
+  // Fonksiyon: Miktarı azalt
+  void decreaseQuantity(DocumentSnapshot item) {
+    int quantity = (item['quantity'] ?? 1) as int;
     if (quantity > 1) {
       var newQuantity = quantity - 1;
-      await item.reference.update({'quantity': newQuantity});
+      item.reference.update({'quantity': newQuantity});
+      setState(() {
+        // Değiştirilmiş siparişleri yerel olarak izle
+        if (!_modifiedOrders.contains(item)) {
+          _modifiedOrders.add({
+            'id': item.id,
+            'quantity': newQuantity,
+          });
+        }
+      });
     } else {
-      // Eğer miktar 1'den küçükse, ürünü sil
-      await item.reference.delete();
+      // Eğer miktar 1'den az ise, siparişi sil
+      item.reference.delete();
     }
-    setState(() {});
   }
 
-  void deleteOrder(DocumentSnapshot item) async {
-    await item.reference.delete();
-    setState(() {});
+  // Fonksiyon: Bir siparişi sil
+  void deleteOrder(DocumentSnapshot item) {
+    item.reference.delete();
   }
 
+  // Fonksiyon: Sepeti temizle
   void clearCart() async {
     setState(() {
       isLoading = true;
     });
 
-    // Belirli masanın tüm siparişlerini silme
+    // Belirli masaya ait tüm siparişleri al
     var orders = await FirebaseFirestore.instance
         .collection('orders')
         .where('tableNumber', isEqualTo: widget.tableNumber)
         .get();
 
+    // Her bir siparişi sil
     for (var order in orders.docs) {
-      await order.reference.delete();
+      order.reference.delete();
     }
 
     setState(() {
       isLoading = false;
     });
 
+    // Başarıyla temizlendiğini belirten bir Snackbar göster
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Cart cleared successfully!'),
+      const SnackBar(
+        content: Text('Sepet başarıyla temizlendi!'),
       ),
     );
   }
 
+// Fonksiyon: Değişiklikleri kaydet
   void saveChanges() async {
     setState(() {
       isLoading = true;
     });
+// Yerel değişiklikler üzerinde döngü yap ve Firestore'u güncelle
+    for (var order in _modifiedOrders) {
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(order['id'])
+          .update({
+        'quantity': order['quantity'],
+      });
+    }
 
-    // Değişiklikleri kaydetme işlemleri burada yapılabilir
-    // Bu örnekte veritabanına zaten güncellenen veriler kaydedildiği için bir işlem yapılmıyor
+// Değişiklikleri kaydettikten sonra yerel değişiklikleri temizle
+    _modifiedOrders.clear();
 
     setState(() {
       isLoading = false;
     });
 
+// Başarıyla kaydedildiğini belirten bir Snackbar göster
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Changes saved successfully!'),
+        content: Text('Değişiklikler başarıyla kaydedildi!'),
       ),
     );
   }
