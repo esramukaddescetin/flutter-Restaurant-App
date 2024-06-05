@@ -9,7 +9,7 @@ class WaiterRequestPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final int tableNumber = ModalRoute.of(context)?.settings.arguments as int;
+    final int tableNumber = ModalRoute.of(context)?.settings.arguments as int;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -102,6 +102,7 @@ class WaiterRequestPage extends StatelessWidget {
                     _requestController.text,
                     tableNumber, // tableNumber'ı burada ekleyin
                   );
+                  _clearForm();
                 },
                 child: const Text(
                   'Garsona Gönder',
@@ -154,5 +155,11 @@ class WaiterRequestPage extends StatelessWidget {
         ),
       );
     });
+  }
+
+  void _clearForm() {
+    _titleController.clear();
+    _requestController.clear();
+  
   }
 }

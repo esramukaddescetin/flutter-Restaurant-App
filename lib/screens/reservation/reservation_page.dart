@@ -1,9 +1,10 @@
 //import 'package:calendar_date_picker2/calendar_date_picker2.dart' as dp;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:restaurant_app/phone_input_formatter.dart';
 import 'package:restaurant_app/utils/my_widgets.dart';
 
-import '../phone_input_formatter.dart';
+
 //import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
 class ReservationPage extends StatefulWidget {
