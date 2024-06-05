@@ -1,21 +1,70 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:restaurant_app/utils/my_widgets.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     home: PaymentPage(),
   ));
 }
 
-class PaymentPage extends StatelessWidget {
+class PaymentPage extends StatefulWidget {
+  @override
+  _PaymentPageState createState() => _PaymentPageState();
+}
+
+class _PaymentPageState extends State<PaymentPage> {
+  final TextEditingController cardNumberController = TextEditingController();
+  final TextEditingController expiryDateController = TextEditingController();
+  final TextEditingController cvvController = TextEditingController();
+  bool isAgreed = false;
+
+  Future<void> _submitPayment() async {
+    if (!isAgreed) {
+      // Show an error message
+      return;
+    }
+
+    final paymentData = {
+      'cardNumber': cardNumberController.text,
+      'expiryDate': expiryDateController.text,
+      'cvv': cvvController.text,
+      'agreed': isAgreed,
+    };
+
+    await FirebaseFirestore.instance.collection('payments').add(paymentData);
+
+    // Show a success message or navigate to another screen
+    _showPaymentSuccessMessage();
+
+    // Clear the form
+    cardNumberController.clear();
+    expiryDateController.clear();
+    cvvController.clear();
+    setState(() {
+      isAgreed = false;
+    });
+  }
+
+  void _showPaymentSuccessMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Ödeme başarıyla alındı!'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Kredi Kartı ile Ödeme',
-            style: TextStyle(color: Colors.white)),
+        title: Text('Kredi Kartı ile Ödeme', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.brown[400],
       ),
@@ -30,23 +79,18 @@ class PaymentPage extends StatelessWidget {
           children: [
             Text(
               'Kart Bilgileri',
-              style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             SizedBox(height: 20),
             TextFormField(
+              controller: cardNumberController,
               style: TextStyle(color: Colors.white70),
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(16),
                 CreditCardNumberInputFormatter(),
               ],
-              decoration: buildInputDecoration(
-                'Kart Numarası',
-                '',
-              ),
+              decoration: buildInputDecoration('Kart Numarası', ''),
             ),
             SizedBox(height: 20),
             Row(
@@ -54,6 +98,7 @@ class PaymentPage extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: TextFormField(
+                    controller: expiryDateController,
                     style: TextStyle(color: Colors.white70),
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -61,45 +106,38 @@ class PaymentPage extends StatelessWidget {
                       ExpiryDateInputFormatter(),
                     ],
                     keyboardType: TextInputType.number,
-                    decoration: buildInputDecoration(
-                      'Son Kullanma Tarihi',
-                      'MM/YY',
-                    ),
+                    decoration: buildInputDecoration('Son Kullanma Tarihi', 'MM/YY'),
                   ),
                 ),
                 SizedBox(width: 10),
                 Expanded(
                   flex: 1,
                   child: TextFormField(
-                    style: TextStyle(
-                      color: Colors.white70,
-                    ),
+                    controller: cvvController,
+                    style: TextStyle(color: Colors.white70),
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(3),
                     ],
-                    decoration: buildInputDecoration(
-                      'CVV',
-                      '',
-                    ),
+                    decoration: buildInputDecoration('CVV', ''),
                   ),
                 ),
               ],
             ),
-            Container(
-              child: AgreementBox(),
+            AgreementBox(
+              isAgreed: isAgreed,
+              onChanged: (value) {
+                setState(() {
+                  isAgreed = value ?? false;
+                });
+              },
             ),
             SizedBox(height: 40),
             Container(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // Ödeme işlemi yap
-                },
-                child: Text(
-                  'Ödeme Yap',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
+                onPressed: _submitPayment,
+                child: Text('Ödeme Yap', style: TextStyle(fontSize: 20, color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -116,13 +154,12 @@ class PaymentPage extends StatelessWidget {
   }
 }
 
-class AgreementBox extends StatefulWidget {
-  @override
-  State<AgreementBox> createState() => _AgreementBoxState();
-}
+class AgreementBox extends StatelessWidget {
+  final bool isAgreed;
+  final ValueChanged<bool?>? onChanged;
 
-class _AgreementBoxState extends State<AgreementBox> {
-  bool isAgreed = false;
+  AgreementBox({required this.isAgreed, required this.onChanged});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -132,15 +169,10 @@ class _AgreementBoxState extends State<AgreementBox> {
         ),
         SizedBox(height: 20),
         Row(
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Checkbox(
               value: isAgreed,
-              onChanged: (value) {
-                setState(() {
-                  isAgreed = value ?? false;
-                });
-              },
+              onChanged: onChanged,
             ),
             Text(
               'Sözleşmeleri okudum ve kabul ediyorum',
