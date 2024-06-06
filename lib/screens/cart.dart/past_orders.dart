@@ -103,7 +103,7 @@ class PastOrdersScreen extends StatelessWidget {
                         children: [
                           const SizedBox(height: 4.0),
                           Text(
-                            'Price: ${data['price']} \₺, Quantity: $quantity',
+                            'Fiyat: ${data['price']} \₺, Miktar: $quantity',
                             style: const TextStyle(
                               fontSize: 16.0,
                               color: Colors.black54,

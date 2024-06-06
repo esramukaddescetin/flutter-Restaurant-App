@@ -22,7 +22,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Shopping Cart',
+          'Sepet',
           style: TextStyle(
             color: Colors.blueGrey[900],
             fontFamily: 'PermanentMarker',
@@ -36,7 +36,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               color: Colors.blueGrey[900],
             ),
             onPressed: () async {
-              var cartItems = await FirebaseFirestore.instance.collection('cart').get();
+              var cartItems =
+                  await FirebaseFirestore.instance.collection('cart').get();
               if (cartItems.docs.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -47,7 +48,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 await sendOrdersToFirestore(widget.tableNumber);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Orders sent to the waiter!'),
+                    content: Text('Siparişleri garsona gönder!'),
                   ),
                 );
               }
@@ -76,17 +77,20 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => OrderListScreen(tableNumber: widget.tableNumber),
+                        builder: (context) =>
+                            OrderListScreen(tableNumber: widget.tableNumber),
                       ),
                     );
                   }
                 },
-                child: const Text('Siparişime Git'),
+                child: const Text('Siparişime Git',
+                    style: TextStyle(color: Colors.teal)),
               ),
             ),
             Expanded(
               child: StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('cart').snapshots(),
+                stream:
+                    FirebaseFirestore.instance.collection('cart').snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -95,7 +99,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   }
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                     return const Center(
-                      child: Text('Shopping cart is empty'),
+                      child: Text('Sepet boş!'),
                     );
                   }
                   var items = snapshot.data!.docs;
@@ -110,9 +114,11 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                           itemBuilder: (context, index) {
                             var item = items[index];
                             return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
                               child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10.0, horizontal: 16.0),
                                 leading: Image.network(
                                   item['imageUrl'],
                                   width: 100,
@@ -132,7 +138,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                   children: [
                                     const SizedBox(height: 4.0),
                                     Text(
-                                      'Price: ${item['price']} \₺',
+                                      'Fiyat: ${item['price']} \₺',
                                       style: const TextStyle(
                                         fontSize: 16.0,
                                         color: Colors.black54,
@@ -149,7 +155,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                         ),
                                         Text(
                                           item['quantity'].toString(),
-                                          style: const TextStyle(fontSize: 16.0),
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.add),
@@ -178,7 +185,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Total Price:',
+                              'Toplam Fiyat:',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -265,7 +272,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PastOrdersScreen(tableNumber: widget.tableNumber),
+                    builder: (context) =>
+                        PastOrdersScreen(tableNumber: widget.tableNumber),
                   ),
                 );
               },

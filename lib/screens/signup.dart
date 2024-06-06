@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Registration Page',
+      title: 'Kayıt Sayfası',
       theme: ThemeData(
         primaryColor: Colors.deepPurple,
         hoverColor: Colors.deepPurpleAccent,
@@ -77,7 +77,7 @@ class RegisterScreen extends StatelessWidget {
                   inputField(
                     _tName,
                     Icons.person,
-                    'First Name',
+                    'Ad',
                   ),
                   /*   TextFormField(
                     decoration: InputDecoration(
@@ -95,7 +95,7 @@ class RegisterScreen extends StatelessWidget {
                   inputField(
                     _tLastName,
                     Icons.person,
-                    'Last Name',
+                    'Soyad',
                   ),
                   SizedBox(height: 10),
                   inputField(
@@ -116,7 +116,7 @@ class RegisterScreen extends StatelessWidget {
                       prefixIcon: Icon(
                         Icons.phone,
                       ),
-                      hintText: 'Phone Number',
+                      hintText: 'Telefon Numarası',
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -128,7 +128,7 @@ class RegisterScreen extends StatelessWidget {
                   inputField(
                     _tPassword,
                     Icons.lock,
-                    'Password',
+                    'Şifre',
                   ),
                   SizedBox(height: 20),
                   SizedBox(
@@ -141,11 +141,10 @@ class RegisterScreen extends StatelessWidget {
                             email: _tEmail.text,
                             // phone: int.parse(_tPhone.text),
                             phone: _tPhone.text,
-                            password: _tPassword.text
-                        );
+                            password: _tPassword.text);
                         //   Navigator.pushNamed(context, '/tableNumberPage');
                       },
-                      child: Text('SIGN UP',
+                      child: Text('KAYIT OL',
                           style: TextStyle(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         //primary: Colors.deepPurple,
@@ -160,12 +159,12 @@ class RegisterScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Already have an account?"),
+                      Text("Zaten hesabınız var mı?"),
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Text('Login'),
+                        child: Text('Giriş'),
                       ),
                     ],
                   ),

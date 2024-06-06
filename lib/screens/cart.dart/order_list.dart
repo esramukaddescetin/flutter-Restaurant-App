@@ -14,7 +14,7 @@ class OrderListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Orders',
+          'Siparişler',
           style: TextStyle(
             color: Colors.blueGrey[900],
             fontFamily: 'PermanentMarker',
@@ -31,7 +31,8 @@ class OrderListScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => OrderUpdateScreen(tableNumber: tableNumber),
+                  builder: (context) =>
+                      OrderUpdateScreen(tableNumber: tableNumber),
                 ),
               );
             },
@@ -56,7 +57,7 @@ class OrderListScreen extends StatelessWidget {
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return const Center(
-                child: Text('No orders found'),
+                child: Text('Sipariş bulunamadı.'),
               );
             }
             var items = snapshot.data!.docs;
@@ -74,7 +75,7 @@ class OrderListScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        'Total Price: ${totalPrice.toStringAsFixed(2)} \₺',
+                        'Toplam Fiyat: ${totalPrice.toStringAsFixed(2)} \₺',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -104,7 +105,7 @@ class OrderListScreen extends StatelessWidget {
                           ),
                         ),
                         subtitle: Text(
-                          'Quantity: ${item['quantity']}',
+                          'Miktar: ${item['quantity']}',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.indigo[900],

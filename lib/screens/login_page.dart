@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Login Page',
+      title: 'Giriş Sayfası',
       theme: ThemeData(
         primaryColor: Colors.deepPurple,
         scaffoldBackgroundColor: Colors.white,
@@ -75,7 +75,7 @@ class LoginPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       const Text(
-                        'Welcome back!',
+                        'Hoşgeldiniz!',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -84,7 +84,7 @@ class LoginPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'Sign in to continue',
+                        'Devam etmek için oturum açın',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white,
@@ -93,7 +93,7 @@ class LoginPage extends StatelessWidget {
                       const SizedBox(height: 32),
                       inputField('Email', Icons.email, _tEmail),
                       const SizedBox(height: 16),
-                      inputField('Password', Icons.lock, _tPassword),
+                      inputField('Şifre', Icons.lock, _tPassword),
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () {
@@ -103,12 +103,15 @@ class LoginPage extends StatelessWidget {
                           // E-posta ve şifre boş mu kontrol edilir
                           if (email.isEmpty || password.isEmpty) {
                             // Eğer boşluk kaldırılmış e-posta ve şifre boşsa, hata mesajı gösterilir
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text('Please enter email and password.'),
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text('Lütfen e-posta ve şifreyi girin.'),
                             ));
                           } else {
                             // E-posta ve şifre boş değilse, giriş yapma işlemi başlatılır
-                            locator.get<AuthService>().signIn(context, email, password);
+                            locator
+                                .get<AuthService>()
+                                .signIn(context, email, password);
                           }
                         },
                         child: const Padding(
@@ -117,7 +120,7 @@ class LoginPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Login',
+                                'Giriş',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.white,
@@ -143,7 +146,7 @@ class LoginPage extends StatelessWidget {
                           Navigator.pushNamed(context, '/forgotpasswordPage');
                         },
                         child: const Text(
-                          'Forgot password?',
+                          'Parolanızı mı unuttunuz?',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -152,7 +155,7 @@ class LoginPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            "Don't have an account? ",
+                            "Hesabınız yok mu?",
                             style: TextStyle(color: Colors.white),
                           ),
                           TextButton(
@@ -160,7 +163,7 @@ class LoginPage extends StatelessWidget {
                               Navigator.pushNamed(context, '/signPage');
                             },
                             child: const Text(
-                              'Sign Up',
+                              'Kayıt Ol',
                               style: TextStyle(color: Colors.white),
                             ),
                           ),

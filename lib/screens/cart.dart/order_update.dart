@@ -119,7 +119,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Price: ${(item['price'] ?? 0.0).toString()} \₺',
+                                  'Fiyat: ${(item['price'] ?? 0.0).toString()} \₺',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.indigo[900],

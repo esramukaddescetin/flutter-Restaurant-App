@@ -67,6 +67,10 @@ class ForgotPasswordScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 12,
+                            backgroundColor: Colors.brown[200],
+                          ),
                           onPressed: () {
                             FirebaseAuth.instance
                                 .sendPasswordResetEmail(email: _tEmail.text)

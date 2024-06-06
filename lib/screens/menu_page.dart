@@ -12,7 +12,7 @@ class MenuScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'MENU, $tableNumber',
+          'MENÜ $tableNumber',
           style: TextStyle(
             color: Colors.deepPurple[900],
             fontFamily: 'PermanentMarker',
@@ -69,7 +69,7 @@ class MenuScreen extends StatelessWidget {
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return const Center(
                 child: Text(
-                  'No menu items available',
+                  'Mevcut menü öğesi yok',
                   style: TextStyle(fontSize: 18),
                 ),
               );
@@ -116,14 +116,14 @@ class MenuScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Ingredients: ${item['ingredients'].join(', ')}',
+                              'İçindekiler: ${item['ingredients'].join(', ')}',
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.blueGrey,
                               ),
                             ),
                             Text(
-                              'Price: ${item['price']} \₺',
+                              'Fiyat: ${item['price']} \₺',
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.teal,
